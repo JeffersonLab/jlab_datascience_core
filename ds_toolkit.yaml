@@ -1,0 +1,24 @@
+name: ds_toolkit_env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10  ## specify desired version
+  - pip
+  - opencv
+
+  ## uncomment for use with Jupyter
+  - ipykernel
+
+  ## PyPI packages
+  - pip:
+    - tensorflow
+    - matplotlib
+    - torch
+    - scipy
+    - tqdm
+    - pandas
+    - unittest2
+    - jupyter
+    - imageio
+    - scikit-image
+    - optuna
