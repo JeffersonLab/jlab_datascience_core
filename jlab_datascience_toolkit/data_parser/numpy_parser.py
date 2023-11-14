@@ -49,7 +49,6 @@ class NumpyParser(JDSTDataParser):
     #*********************************************
     # Load the config:
     def load_config(self,path_to_cfg,user_config):
-        # This function assumes that all configs are stor
         with open(path_to_cfg, 'r') as file:
             cfg = yaml.safe_load(file)
         
@@ -78,7 +77,7 @@ class NumpyParser(JDSTDataParser):
     # Load a single file:
     def load_single_file(self,path_to_file):
         try:
-            return np.load(path_to_file)
+            return np.load(path_to_file).astype(self.config['dtype'])
         except:
             logging.exception(">>> " + self.module_name + ": File does not exist! <<<")
 
@@ -102,7 +101,8 @@ class NumpyParser(JDSTDataParser):
     #*********************************************
     def save_data(self,data):
         try:
-           np.save(self.config['store_loc'],data)
+           os.makedirs(self.config['data_store_loc'],exist_ok=True) 
+           np.save(self.config['data_store_loc'],data)
         except:
            logging.exception(">>> " + self.module_name + ": Please provide a valid name for storing the data in .npy format. <<<")
     #*********************************************
