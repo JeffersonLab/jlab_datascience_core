@@ -74,22 +74,39 @@ class NumpyMinMaxScaler(JDSTDataPrep):
         with open(path_to_config, 'w') as file:
            yaml.dump(self.config, file)
     #*********************************************
+    
+    # Run a type chec:
+    #*********************************************
+    def type_check(self,data):
+        if isinstance(data,np.ndarray) == False:
+            logging.error(">>> " + self.module_name + ": Data is not a numpy array <<<")
+            return False
+        
+        return True
+    #*********************************************
+
+    
 
     # Run and reverse the scaling: 
     #*********************************************
     # Scale:
     def run(self,data,disable_fit=False):
-        # Do not re-calibrate the scaler, if a fit has already been done:
-        if disable_fit == True:
-              return self.scaler.transform(data)
+        # Check if the data-type is a numpy array:
+        if self.type_check(data):
 
-        return self.scaler.fit_transform(data)
+           # Do not re-calibrate the scaler, if a fit has already been done:
+           if disable_fit == True:
+               return self.scaler.transform(data)
 
+           return self.scaler.fit_transform(data)
+        
     #-----------------------------
 
     # Undo the scaling:
     def reverse(self,data):
-        return self.scaler.inverse_transform(data)
+        # Run a type check:
+        if self.type_check(data):
+           return self.scaler.inverse_transform(data)
     #*********************************************
 
     # Save the data:

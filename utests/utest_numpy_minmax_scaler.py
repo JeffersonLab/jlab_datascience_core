@@ -107,7 +107,19 @@ class UTestNumpyMinMaxScaler(unittest.TestCase):
         print("...done!")
         print("  ")
 
-        self.assertTrue(pass_range_check_1 & pass_range_check_2 & pass_checkpointing)
+        # Test if the type checker is working:
+        passTypeChecker = False
+        print("Test type checker (an error message should show up below this line)...")
+
+        val = npy_scaler.run([1,2,3,4])
+
+        if val is None:
+            passTypeChecker = True
+
+        print("...done!")
+        print("  ")
+
+        self.assertTrue(pass_range_check_1 & pass_range_check_2 & pass_checkpointing & passTypeChecker)
 
         print("Have a great day!")
     #*****************************************
