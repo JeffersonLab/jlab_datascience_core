@@ -9,7 +9,7 @@ class JDSTDataParser(JDSTModule,ABC):
     
     # Load and save the data:
     def load_data(self):
-        return NotImplemented
+        raise NotImplementedError
     
     def save_data(self):
-        return NotImplemented
+        raise NotImplementedError

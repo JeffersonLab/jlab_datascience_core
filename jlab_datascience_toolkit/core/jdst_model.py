@@ -8,13 +8,13 @@ class JDSTModel(JDSTModule,ABC):
 
     # Train the model:
     def train(self):
-        return NotImplemented
+        raise NotImplementedError
 
     # Get a prediction:
     def predict(self):
-        return NotImplemented
+        raise NotImplementedError
     
     # Run a small analysis (e.g. determine ROC-Curve, MSE,...)
     def analysis(self):
-        return NotImplemented
+        raise NotImplementedError
     

@@ -11,12 +11,12 @@ class JDSTDataPrep(JDSTModule,ABC):
     # This might be helpful, if the underlying data preperation is a computational intensive operation
     # And we want to avoid calling it multiple times. Thus, we just store the data after preparation:
     def save_data(self):
-        return NotImplemented
+        raise NotImplementedError
     
     # Run the data preparation:
     def run(self):
-        return NotImplemented
+        raise NotImplementedError
 
     # Reverse the data preparation (if possible):
     def reverse(self):
-        return NotImplemented
+        raise NotImplementedError

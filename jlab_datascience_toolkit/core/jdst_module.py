@@ -14,18 +14,18 @@ class JDSTModule(ABC):
     # Get module info: Just briefly describe what this module is doing, 
     # what are the inputs and what is returned?
     def get_info(self):
-        return NotImplemented
+        raise NotImplementedError
     
-    # Load and save configuration files which run  the module:
+    # Load and save configuration files which run the module:
     def load_config(self):
-        return NotImplemented
+        raise NotImplementedError
     
     def save_config(self):
-        return NotImplemented
+        raise NotImplementedError
     
     # Load and save for checkpointing (i.e. capture state of module)
     def load(self):
-        return NotImplemented
+        raise NotImplementedError
     
     def save(self):
-        return NotImplemented
+        raise NotImplementedError
