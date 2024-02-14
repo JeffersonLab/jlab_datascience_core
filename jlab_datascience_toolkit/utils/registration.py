@@ -21,9 +21,11 @@ class ModuleSpec(object):
     def make(self, **kwargs):
         """Instantiates an instance of data module with appropriate kwargs"""
         if self.entry_point is None:
-            raise data_log.error('Attempting to make deprecated module {}. \
+            module_log.error('Attempting to make deprecated module {}. \
                                (HINT: is there a newer registered version \
                                of this module?)'.format(self.id))
+            raise RuntimeError
+        
         _kwargs = self._kwargs.copy()
         _kwargs.update(kwargs)
         if callable(self.entry_point):
@@ -58,9 +60,10 @@ class ModuleRegistry(object):
             try:
                 importlib.import_module(mod_name)
             except ImportError:
-                raise module_log.error('A module ({}) was specified for the module but was not found, \
+                module_log.error('A module ({}) was specified for the module but was not found, \
                                    make sure the package is installed with `pip install` before \
                                    calling `module.make()`'.format(mod_name))
+                raise
 
         else:
             id = path
@@ -68,11 +71,13 @@ class ModuleRegistry(object):
         try:
             return self.module_specs[id]
         except KeyError:
-            raise module_log.error('No registered module with id: {}'.format(id))
+            module_log.error('No registered module with id: {}'.format(id))
+            raise 
 
     def register(self, id, **kwargs):
         if id in self.module_specs:
-            raise module_log.error('Cannot re-register id: {}'.format(id))
+            module_log.error('Cannot re-register id: {}'.format(id))
+            raise RuntimeError
         self.module_specs[id] = ModuleSpec(id, **kwargs)
 
 
