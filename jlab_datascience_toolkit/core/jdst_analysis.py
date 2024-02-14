@@ -8,4 +8,4 @@ class JDSTAnalysis(JDSTModule,ABC):
 
     # Run the analysis:
     def run(self):
-        return NotImplemented
+        raise NotImplementedError
