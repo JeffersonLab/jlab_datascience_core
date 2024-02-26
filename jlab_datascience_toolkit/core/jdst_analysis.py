@@ -7,5 +7,6 @@ class JDSTAnalysis(JDSTModule,ABC):
     '''
 
     # Run the analysis:
+    @abstractmethod
     def run(self):
         raise NotImplementedError

@@ -8,8 +8,10 @@ class JDSTDataParser(JDSTModule,ABC):
     '''
     
     # Load and save the data:
+    @abstractmethod
     def load_data(self):
         raise NotImplementedError
     
+    @abstractmethod
     def save_data(self):
         raise NotImplementedError

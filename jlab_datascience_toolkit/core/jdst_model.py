@@ -7,14 +7,17 @@ class JDSTModel(JDSTModule,ABC):
     '''
 
     # Train the model:
+    @abstractmethod
     def train(self):
         raise NotImplementedError
 
     # Get a prediction:
+    @abstractmethod
     def predict(self):
         raise NotImplementedError
     
     # Run a small analysis (e.g. determine ROC-Curve, MSE,...)
+    @abstractmethod
     def analysis(self):
         raise NotImplementedError
     
