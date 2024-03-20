@@ -2,12 +2,22 @@ from jlab_datascience_toolkit.core.jdst_data_parser import JDSTDataParser
 import numpy as np
 import yaml
 import logging
+import inspect
 
 class NumpyParser(JDSTDataParser):
+    """Numpy data parser that reads in strings of file paths and returns a single .npy file
 
-    '''
-    Numpy data parser that reads in strings of file paths and returns a single .npy file
-    '''
+    What this module does:
+    "i) Read in multiple .npy files that are specified in a list of strings
+    ii) Combine single .npy files into one
+
+    Input(s):
+    i) Full path to .yaml configuration file 
+    ii) Optional: User configuration, i.e. a python dict with additonal / alternative settings
+
+    Output(s):
+    i) Single .npy file
+    """
 
     # Initialize:
     #*********************************************
@@ -31,18 +41,7 @@ class NumpyParser(JDSTDataParser):
     # Provide information about this module:
     #*********************************************
     def get_info(self):
-        print("  ")
-        print("***   Info: NumpyParser   ***")
-        print("Input(s):")
-        print("i) Full path to .yaml configuration file ") 
-        print("ii) Optional: User configuration, i.e. a python dict with additonal / alternative settings")
-        print("What this module does:")
-        print("i) Read in multiple .npy files that are specified in a list of strings")
-        print("ii) Combine single .npy files into one")
-        print("Output(s):")
-        print("i) Single .npy file")
-        print("***   Info: NumpyParser   ***")
-        print("  ")
+        print(inspect.getdoc(self))
     #*********************************************
 
     # Handle configurations:
