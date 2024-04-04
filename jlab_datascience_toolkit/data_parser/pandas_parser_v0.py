@@ -86,7 +86,7 @@ class Pandas_Parser(JDSTDataParser):
     def setup(self):
         # Set the correct reading function here
         self.read_function = pandas_read_functions.get(
-            self.config['file_format'], None)
+            self.config['file_format'].lower(), None)
 
         if self.read_function is None:
             pandas_parser_log.error(
