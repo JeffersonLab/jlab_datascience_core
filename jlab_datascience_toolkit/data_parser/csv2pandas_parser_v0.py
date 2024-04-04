@@ -6,10 +6,10 @@ import yaml
 import inspect
 import os
 
-csv_parser_log = logging.getLogger('CSV Reader to Pandas V0 Logger')
+csv_parser_log = logging.getLogger('CSV2Pandas V0 Logger')
 
 
-class CSV_Parser_to_Pandas(JDSTDataParser):
+class CSV2Pandas_Parser(JDSTDataParser):
     """Reads a list of .csv files and concatenates them along a given axis.
 
     Optional intialization arguments: 
@@ -52,7 +52,7 @@ class CSV_Parser_to_Pandas(JDSTDataParser):
 
     """
 
-    def __init__(self, config: dict = None, name: str = "CSV Reader to Pandas V0"):
+    def __init__(self, config: dict = None, name: str = "CSV2Pandas Parser V0"):
         # It is important not to use default mutable arguments in python
         #   (lists/dictionaries), so we set config to None and update later
         self.module_name = name
