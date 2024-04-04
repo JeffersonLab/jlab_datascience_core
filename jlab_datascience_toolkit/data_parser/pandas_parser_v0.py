@@ -6,11 +6,19 @@ import yaml
 import inspect
 import os
 
-csv_parser_log = logging.getLogger('CSV2Pandas V0 Logger')
+pandas_parser_log = logging.getLogger('Pandas V0 Logger')
 
+# Supported file formats
+pandas_read_functions = dict(
+    csv=pd.read_csv,
+    feather=pd.read_feather,
+    json=pd.read_json,
+    pickle=pd.read_pickle
+)
 
-class CSV2Pandas_Parser(JDSTDataParser):
-    """Reads a list of .csv files and concatenates them along a given axis.
+class Pandas_Parser(JDSTDataParser):
+    """Reads a list of files and concatenates them along a given axis.
+    Returns a Pandas DataFrame
 
     Optional intialization arguments: 
         `config: dict`
@@ -20,7 +28,7 @@ class CSV2Pandas_Parser(JDSTDataParser):
         `filepaths: str | list[str]`
     Optional configuration keys: 
         `axis: int = 0`
-        `sep: str = ','`
+        `file_format: str = 'csv',
         `read_args: dict = {}`
         `concat_args: dict = {'ignore_index: True}`
 
@@ -52,7 +60,7 @@ class CSV2Pandas_Parser(JDSTDataParser):
 
     """
 
-    def __init__(self, config: dict = None, name: str = "CSV2Pandas Parser V0"):
+    def __init__(self, config: dict = None, name: str = "Pandas Parser V0"):
         # It is important not to use default mutable arguments in python
         #   (lists/dictionaries), so we set config to None and update later
         self.module_name = name
@@ -61,7 +69,7 @@ class CSV2Pandas_Parser(JDSTDataParser):
         self.config = dict(
             filepaths=[], 
             axis=0,
-            sep=',',
+            file_format='csv',
             read_args = {},
             concat_args = {'ignore_index': True},
         )
@@ -73,8 +81,21 @@ class CSV2Pandas_Parser(JDSTDataParser):
         if isinstance(self.config['filepaths'], str):
             self.config['filepaths'] = [self.config['filepaths']]
 
+        self.setup()
+
+    def setup(self):
+        # Set the correct reading function here
+        self.read_function = pandas_read_functions.get(
+            self.config['file_format'], None)
+
+        if self.read_function is None:
+            pandas_parser_log.error(
+                    f'File format {self.config["file_format"]}'
+                     'is not currently supported.')
+            raise ValueError
+
     def get_info(self):
-        """ Prints the docstring for the AIDAPTCSVReaderV0 module"""
+        """ Prints the docstring for the Pandas_Parser module"""
         print(inspect.getdoc(self))
 
     def load(self, path: str):
@@ -89,6 +110,7 @@ class CSV2Pandas_Parser(JDSTDataParser):
             loaded_config = yaml.safe_load(f)
 
         self.config.update(loaded_config)
+        self.setup()
 
     def save(self, path: str):
         """Save the entire module state to a folder at `path`
@@ -110,38 +132,36 @@ class CSV2Pandas_Parser(JDSTDataParser):
         """
         data_list = []
         for file in self.config['filepaths']:
-            csv_parser_log.debug(f'Loading {file} ...')
-            data = pd.read_csv(
+            pandas_parser_log.debug(f'Loading {file} ...')
+            data = self.read_function(
                 file, 
-                sep=self.config['sep'], 
                 **self.config['read_args'])
             data_list.append(data)
 
         # Check for empty data and return nothing if empty
         if not data_list:
-            csv_parser_log.warn(
+            pandas_parser_log.warn(
                 'load_data() returning None. This is probably not what you '
                 'wanted. Ensure that your configuration includes the key '
                 '"filepaths"')
             return 
         
-        output = pd.concat(data_list, axis=self.config['axis'], **self.config['concat_args'])
+        output = pd.concat(
+            data_list, 
+            axis=self.config['axis'], 
+            **self.config['concat_args'])
+        
         return output
 
-    # Unimplemented functions
     def save_data(self, path: str):
-        csv_parser_log.warning(
+        pandas_parser_log.warning(
             'save_data() is currently unimplemented.')
         pass
 
     def load_config(self, path: str):
-        csv_parser_log.debug(
-            'load_config() is currently unimplemented. '
-            'Calling load()...')
+        pandas_parser_log.debug('Calling load()...')
         return self.load(path)
 
     def save_config(self, path: str):
-        csv_parser_log.debug(
-            'save_config() is currently unimplemented.'
-            ' Calling save()...?')
+        pandas_parser_log.debug('Calling save()...')
         return self.save(path)
