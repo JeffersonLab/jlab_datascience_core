@@ -6,7 +6,7 @@ import yaml
 import inspect
 import os
 
-pandas_parser_log = logging.getLogger('Pandas V0 Logger')
+pandas_parser_log = logging.getLogger('PandasParser_v0 Logger')
 
 # Supported file formats
 pandas_read_functions = dict(
@@ -16,26 +16,26 @@ pandas_read_functions = dict(
     pickle=pd.read_pickle
 )
 
-class Pandas_Parser(JDSTDataParser):
-    """Reads a list of files and concatenates them along a given axis.
-    Returns a Pandas DataFrame
+class PandasParser(JDSTDataParser):
+    """Reads a list of files and concatenates them in a Pandas DataFrame.
 
-    Optional intialization arguments: 
+    Intialization arguments: 
         `config: dict`
-        `name: str`
 
-    Required configuration keys: 
-        `filepaths: str | list[str]`
     Optional configuration keys: 
-        `axis: int = 0`
+        `filepaths: str | list[str]`
+            Paths to files the module should parse. Defaults to `[]` which 
+            produces a warning when load_data() is called.
         `file_format: str = 'csv',
-        `read_args: dict = {}`
-        `concat_args: dict = {'ignore_index: True}`
-
+            Format of files to parse. Currently supports csv, feather, json
+            and pickle. Defaults to csv
+        `read_kwargs: dict = {}`
+            Arguments to be passed 
+        `concat_kwargs: dict = {'ignore_index: True}`
 
     Attributes
     ----------
-    module_name : str
+    name : str
         Name of the module
     config: dict
         Configuration information
@@ -45,12 +45,11 @@ class Pandas_Parser(JDSTDataParser):
     get_info()
         Prints this docstring
     load(path)
-        Loads this module from `path/self.module_name`
+        Loads this module from `path`
     save(path)
-        Saves this module from `path/self.module_name`
+        Saves this module to `path`
     load_data(path)
-        Loads all files listed in `config['filepaths']` and concatenates them 
-        along the `config['axis']` axis
+        Loads all files listed in `config['filepaths']` and concatenates them
     save_data(path)
         Does nothing
     load_config(path)
@@ -60,18 +59,16 @@ class Pandas_Parser(JDSTDataParser):
 
     """
 
-    def __init__(self, config: dict = None, name: str = "Pandas Parser V0"):
+    def __init__(self, config: dict = None):
         # It is important not to use default mutable arguments in python
         #   (lists/dictionaries), so we set config to None and update later
-        self.module_name = name
 
         # Set default config
         self.config = dict(
             filepaths=[], 
-            axis=0,
             file_format='csv',
-            read_args = {},
-            concat_args = {'ignore_index': True},
+            read_kwargs = {},
+            concat_kwargs = {},
         )
         # Update configuration with new configuration
         if config is not None:
@@ -82,6 +79,10 @@ class Pandas_Parser(JDSTDataParser):
             self.config['filepaths'] = [self.config['filepaths']]
 
         self.setup()
+
+    @property
+    def name(self):
+        return 'PandasParser_v0'
 
     def setup(self):
         # Set the correct reading function here
@@ -95,7 +96,7 @@ class Pandas_Parser(JDSTDataParser):
             raise ValueError
 
     def get_info(self):
-        """ Prints the docstring for the Pandas_Parser module"""
+        """ Prints the docstring for the PandasParser module"""
         print(inspect.getdoc(self))
 
     def load(self, path: str):
@@ -105,8 +106,7 @@ class Pandas_Parser(JDSTDataParser):
             path (str): Path to folder containing module files.
         """
         base_path = Path(path)
-        save_dir = base_path.joinpath(self.module_name)
-        with open(save_dir.joinpath('config.yaml'), 'r') as f:
+        with open(base_path.joinpath('config.yaml'), 'r') as f:
             loaded_config = yaml.safe_load(f)
 
         self.config.update(loaded_config)
@@ -124,8 +124,9 @@ class Pandas_Parser(JDSTDataParser):
             yaml.safe_dump(self.config, f)
 
     def load_data(self) -> pd.DataFrame:
-        """ Loads all files listed in `config['filepaths']` and concatenates 
-        them along the `config['axis']` axis
+        """ Loads all files listed in `config['filepaths']` 
+        read_kwargs are passed to the appropriate pd.read_{file_format} function
+        concat_kwargs are passed to pd.concat() after all files are read
 
         Returns:
             pd.DataFrame: A single DataFrame containing concatenated data
@@ -135,12 +136,12 @@ class Pandas_Parser(JDSTDataParser):
             pandas_parser_log.debug(f'Loading {file} ...')
             data = self.read_function(
                 file, 
-                **self.config['read_args'])
+                **self.config['read_kwargs'])
             data_list.append(data)
 
         # Check for empty data and return nothing if empty
         if not data_list:
-            pandas_parser_log.warn(
+            pandas_parser_log.warning(
                 'load_data() returning None. This is probably not what you '
                 'wanted. Ensure that your configuration includes the key '
                 '"filepaths"')
@@ -148,15 +149,9 @@ class Pandas_Parser(JDSTDataParser):
         
         output = pd.concat(
             data_list, 
-            axis=self.config['axis'], 
-            **self.config['concat_args'])
+            **self.config['concat_kwargs'])
         
         return output
-
-    def save_data(self, path: str):
-        pandas_parser_log.warning(
-            'save_data() is currently unimplemented.')
-        pass
 
     def load_config(self, path: str):
         pandas_parser_log.debug('Calling load()...')
@@ -165,3 +160,6 @@ class Pandas_Parser(JDSTDataParser):
     def save_config(self, path: str):
         pandas_parser_log.debug('Calling save()...')
         return self.save(path)
+    
+    def save_data(self):
+        return super().save_data()
