@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='jlab_datascience_toolkit',
@@ -6,6 +6,6 @@ setup(
     description='JLab datascience toolkit for composable workflows',
     author='JLab DataScience Department',
     author_email='schram@jlab.org, kishan@jlab.org, dianam@jlab.org, dlersch@jlab.org',
-    packages=['jlab_datascience_toolkit'],
+    packages=find_packages(),
     install_requires=[]
 )
