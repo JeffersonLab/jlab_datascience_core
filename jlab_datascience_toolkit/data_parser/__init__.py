@@ -7,3 +7,7 @@ register(
 
 from jlab_datascience_toolkit.data_parser.numpy_parser import NumpyParser
 
+register(
+    id="PandasParser_v0",
+    entry_point="jlab_datascience_toolkit.data_parser.pandas_parser_v0:PandasParser"
+)
