@@ -34,10 +34,24 @@ class TestPandasParserv0(unittest.TestCase):
         test_data
         test_data.to_csv(self.path)
 
+        self.path2 = './pandas_parser_utest2.csv'
+        data = rng.normal(loc=9, scale=2, size=(
+            self.samples, len(self.columns)))
+        dates = []
+        for i in range(1, self.samples+1):
+            dates.append(np.datetime64(
+                f'2010-03-25 09:{i//60:02d}:{i % 60:02d}'))
+
+        test_data = pd.DataFrame(data, columns=self.columns, index=dates)
+        test_data.index.name = 'Date'
+        test_data
+        test_data.to_csv(self.path2)
+
     @classmethod
     def tearDownClass(self) -> None:
         print('Removing temporary files...')
         os.remove(self.path)
+        os.remove(self.path2)
         print('Have a good day!')
 
     def setUp(self) -> None:
@@ -57,8 +71,7 @@ class TestPandasParserv0(unittest.TestCase):
     def test_string_filepaths(self):
         print('*****String Filepaths Test*****\n')
 
-        parser = make('PandasParser_v0', config=dict(
-            filepaths='./pandas_parser_utest.csv'))
+        parser = make('PandasParser_v0', config=dict(filepaths=self.path))
         output = parser.load_data()
         print('Output Head:\n', output.head())
 
@@ -67,18 +80,25 @@ class TestPandasParserv0(unittest.TestCase):
     def test_one_item_list_filepaths(self):
         print('*****One Item List Test*****\n')
 
-        parser = make('PandasParser_v0', config=dict(
-            filepaths=['./pandas_parser_utest.csv']))
+        parser = make('PandasParser_v0', config=dict(filepaths=[self.path]))
         output = parser.load_data()
         print('Output Head:\n', output.head())
         self.assertEqual(output.shape, (self.samples, len(self.columns)+1))
+
+    def test_two_filepaths(self):
+        print('*****Two Filepaths Test*****\n')
+        parser = make('PandasParser_v0', config=dict(filepaths=[self.path, self.path2]))
+        output = parser.load_data()
+        print('Output Head:\n', output.head())
+        print('Output shape:', output.shape)
+        self.assertEqual(output.shape, (2*self.samples, len(self.columns)+1))
 
     def test_usecols_read_arg(self):
         print('*****Usecols Read Arg Test*****\n')
 
         two_columns = ['R121GMES', 'R121GSET']
         parser = make('PandasParser_v0', config=dict(
-            filepaths='./pandas_parser_utest.csv', read_kwargs=dict(usecols=two_columns)))
+            filepaths=self.path, read_kwargs=dict(usecols=two_columns)))
         output = parser.load_data()
         print('Output Head:\n', output.head())
         self.assertEqual(output.shape, (self.samples, 2))
@@ -92,7 +112,7 @@ class TestPandasParserv0(unittest.TestCase):
                            index_col='Date', parse_dates=True)
         parser = make('PandasParser_v0',
                       config=dict(
-                          filepaths='./pandas_parser_utest.csv', read_kwargs=read_kwargs)
+                          filepaths=self.path, read_kwargs=read_kwargs)
                       )
         output = parser.load_data()
         print('Output Head:\n', output.head())
