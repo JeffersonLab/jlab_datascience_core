@@ -31,7 +31,7 @@ class PandasParser(JDSTDataParser):
             and pickle. Defaults to csv
         `read_kwargs: dict = {}`
             Arguments to be passed 
-        `concat_kwargs: dict = {'ignore_index: True}`
+        `concat_kwargs: dict = {}`
 
     Attributes
     ----------
