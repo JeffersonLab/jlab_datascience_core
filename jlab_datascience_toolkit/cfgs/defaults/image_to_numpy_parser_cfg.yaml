@@ -1,0 +1,5 @@
+image_loc: ""
+dtype: "float32"
+convert_image_mode: "RGB"
+data_store_loc: ""
+event_axis: 0 

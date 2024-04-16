@@ -1,15 +1,17 @@
 from jlab_datascience_toolkit.core.jdst_data_parser import JDSTDataParser
+from PIL import Image
+import os
 import numpy as np
-import yaml
 import logging
 import inspect
-import os
+import yaml
 
-class NumpyParser(JDSTDataParser):
-    """Numpy data parser that reads in strings of file paths and returns a single .npy file
+class ImageToNumpyParser(JDSTDataParser):
+
+    """Image to Numpy data parser that reads in strings of file paths to images and returns a single .npy file
 
     What this module does:
-    "i) Read in multiple .npy files that are specified in a list of strings
+    "i) Read in multiple .png files that are specified in a list of strings
     ii) Combine single .npy files into one
 
     Input(s):
@@ -24,7 +26,7 @@ class NumpyParser(JDSTDataParser):
     #*********************************************
     def __init__(self,path_to_cfg,user_config={}):
         # Set the name specific to this module:
-        self.module_name = "numpy_parser"
+        self.module_name = "image_to_numpy_parser"
 
         # Load the configuration:
         self.config = self.load_config(path_to_cfg,user_config)
@@ -35,7 +37,7 @@ class NumpyParser(JDSTDataParser):
 
         # Run sanity check(s):
         # i) Make sure that the provide data path(s) are list objects:
-        if isinstance(self.config['data_loc'],list) == False:
+        if isinstance(self.config['image_loc'],list) == False:
             logging.error(">>> " + self.module_name +": The data path(s) must be a list object, e.g. data_loc: [path1,path2,...] <<<")
     #*********************************************
 
@@ -71,32 +73,37 @@ class NumpyParser(JDSTDataParser):
         with open(path_to_config, 'w') as file:
            yaml.dump(self.config, file)
     #*********************************************
-    
-    # Load .npy file(s):
+
+    # Load images:
     #*********************************************
-    # Load a single file:
-    def load_single_file(self,path_to_file):
+    # Load a single image:
+    def load_single_image(self,path):
         try:
-            return np.load(path_to_file).astype(self.config['dtype'])
+               img = Image.open(path)
+               if self.config['convert_image_mode'] is not None:
+                   img = img.convert(self.config['convert_image_mode'])
+                
+               data = np.array(img).astype(self.config['dtype']) 
+               return data
         except:
-            logging.exception(">>> " + self.module_name + ": File does not exist! <<<")
+            logging.exception(f">>> " + self.module_name + ": File {path} does not exist <<<")
 
     #-----------------------------
 
-    # Load multiple files which represent the final data:
+    # Now load multiple files:
     def load_data(self):
         try:
             collected_data = []
             #+++++++++++++++++++++
-            for path in self.config['data_loc']:
-                collected_data.append(self.load_single_file(path))
+            for path in self.config['image_loc']:
+                collected_data.append(np.expand_dims(self.load_single_image(path),axis=self.config['event_axis']))
             #+++++++++++++++++++++
 
             return np.concatenate(collected_data,axis=self.config['event_axis'])
         except:
             logging.exception(">>> " + self.module_name + ": Please check the provided data path which must be a list. <<<")
     #*********************************************
-    
+
     # Save the data:
     #*********************************************
     def save_data(self,data):
@@ -118,7 +125,3 @@ class NumpyParser(JDSTDataParser):
     def save(self):
         return 0
     #*********************************************
-
-    
-    
-
