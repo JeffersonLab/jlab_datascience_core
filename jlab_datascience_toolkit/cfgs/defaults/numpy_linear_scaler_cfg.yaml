@@ -1,0 +1,6 @@
+'A': 1.0 / 255.0
+'B': 0.0
+data_store_loc: ""
+store_loc: ""
+run_dtype: "float32"
+reverse_dtype: "float32"
