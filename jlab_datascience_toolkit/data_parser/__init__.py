@@ -11,3 +11,8 @@ register(
     id="PandasParser_v0",
     entry_point="jlab_datascience_toolkit.data_parser.pandas_parser_v0:PandasParser"
 )
+
+register(
+    id='CSVParser_v0',
+    entry_point="jlab_datascience_toolkit.data_parser.csv_parser_v0:CSVParser"
+)
