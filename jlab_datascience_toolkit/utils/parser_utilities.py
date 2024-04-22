@@ -15,14 +15,6 @@ def load_yaml_config(path):
         config = yaml.safe_load(f)
     return config
 
-# Supported file formats
-read_functions = dict(
-    csv=pd.read_csv,
-    feather=pd.read_feather,
-    json=pd.read_json,
-    pickle=pd.read_pickle
-)
-
 def read_data_to_pandas(filepaths: list, file_format: str, **kwargs) -> pd.DataFrame:
         """ Loads all files listed in filepaths and reads them.
         All kwargs other than filepaths and file_format will be passed to the read_function
@@ -31,6 +23,15 @@ def read_data_to_pandas(filepaths: list, file_format: str, **kwargs) -> pd.DataF
         Returns:
             pd.DataFrame: A single DataFrame containing list of dataframes
         """
+
+        # Supported file formats
+        read_functions = dict(
+            csv=pd.read_csv,
+            feather=pd.read_feather,
+            json=pd.read_json,
+            pickle=pd.read_pickle
+        )
+
         data_list = []
         read_function = read_functions[file_format]
         for file in filepaths:
