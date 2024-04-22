@@ -6,6 +6,7 @@ import numpy as np
 import os
 
 rng = np.random.default_rng(seed=42)
+parser_id = 'PandasParser_v0'
 
 
 class TestPandasParserv0(unittest.TestCase):
@@ -64,14 +65,14 @@ class TestPandasParserv0(unittest.TestCase):
 
     def test_no_config(self):
         print('*****No Config Test*****\n')
-        parser = make('PandasParser_v0')
+        parser = make(parser_id)
         output = parser.load_data()
         self.assertIsNone(output)
 
     def test_string_filepaths(self):
         print('*****String Filepaths Test*****\n')
 
-        parser = make('PandasParser_v0', config=dict(filepaths=self.path))
+        parser = make(parser_id, config=dict(filepaths=self.path))
         output = parser.load_data()
         print('Output Head:\n', output.head())
 
@@ -80,14 +81,14 @@ class TestPandasParserv0(unittest.TestCase):
     def test_one_item_list_filepaths(self):
         print('*****One Item List Test*****\n')
 
-        parser = make('PandasParser_v0', config=dict(filepaths=[self.path]))
+        parser = make(parser_id, config=dict(filepaths=[self.path]))
         output = parser.load_data()
         print('Output Head:\n', output.head())
         self.assertEqual(output.shape, (self.samples, len(self.columns)+1))
 
     def test_two_filepaths(self):
         print('*****Two Filepaths Test*****\n')
-        parser = make('PandasParser_v0', config=dict(filepaths=[self.path, self.path2]))
+        parser = make(parser_id, config=dict(filepaths=[self.path, self.path2]))
         output = parser.load_data()
         print('Output Head:\n', output.head())
         print('Output shape:', output.shape)
@@ -97,7 +98,7 @@ class TestPandasParserv0(unittest.TestCase):
         print('*****Usecols Read Arg Test*****\n')
 
         two_columns = ['R121GMES', 'R121GSET']
-        parser = make('PandasParser_v0', config=dict(
+        parser = make(parser_id, config=dict(
             filepaths=self.path, read_kwargs=dict(usecols=two_columns)))
         output = parser.load_data()
         print('Output Head:\n', output.head())
@@ -110,7 +111,7 @@ class TestPandasParserv0(unittest.TestCase):
         def column_lambda(x): return ('GMES' in x) or (x == 'Date')
         read_kwargs = dict(usecols=column_lambda,
                            index_col='Date', parse_dates=True)
-        parser = make('PandasParser_v0',
+        parser = make(parser_id,
                       config=dict(
                           filepaths=self.path, read_kwargs=read_kwargs)
                       )
