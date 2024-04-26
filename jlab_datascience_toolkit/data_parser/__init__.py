@@ -9,5 +9,6 @@ from jlab_datascience_toolkit.data_parser.numpy_parser import NumpyParser
 
 register(
     id='CSVParser_v0',
-    entry_point="jlab_datascience_toolkit.data_parser.csv_parser_v0:CSVParser"
+    entry_point="jlab_datascience_toolkit.data_parser.parser_to_dataframe:Parser2DataFrame",
+    kwargs={'registry_config': {'file_format': 'csv'}}
 )

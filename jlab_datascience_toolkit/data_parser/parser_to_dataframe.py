@@ -59,9 +59,14 @@ class Parser2DataFrame(JDSTDataParser):
 
     """
 
-    def __init__(self, config: dict = None):
+    def __init__(self, config: dict = None, registry_config: dict = None):
         # It is important not to use default mutable arguments in python
         #   (lists/dictionaries), so we set config to None and update later
+
+        # Priority for configurations is:
+        # 1) config (intended for users)
+        # 2) registry_config (intended only for the registry)
+        # 3) defaults (set below)
 
         # Set default config
         self.config = dict(
@@ -70,8 +75,15 @@ class Parser2DataFrame(JDSTDataParser):
             read_kwargs = {},
             concat_kwargs = {},
         )
-        # Update configuration with new configuration
+
+        # First update defaults with registry_configuration
+        if registry_config is not None:
+            parser_log.debug(f'Updating defaults with: {registry_config}')
+            self.config.update(registry_config)
+
+        # Now update configuration with new (user) configuration
         if config is not None:
+            parser_log.debug(f'Updating registered config with: {config}')
             self.config.update(config)
 
         # To handle strings and lists of strings, we convert the former here
