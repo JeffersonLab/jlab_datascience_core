@@ -13,9 +13,9 @@ class PandasStandardScaler(JDSTDataPrep):
         self.config = dict(axis = 0)
 
 	if registry_config is not None:
-            self.config.update(registry_config)
-        if config is not None:
-            self.config.update(config)
+        self.config.update(registry_config)
+    if config is not None:
+        self.config.update(config)
 
         self.setup()
 
