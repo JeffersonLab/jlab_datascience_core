@@ -10,7 +10,7 @@ import os
 parser_log = logging.getLogger('CSVParser Logger')
 
 class CSVParser(JDSTDataParser):
-    """Reads a list of CSV files and concatenates them in a CSV DataFrame.
+    """Reads a list of CSV files and concatenates them in a Pandas DataFrame.
 
     Intialization arguments: 
         `config: dict`
