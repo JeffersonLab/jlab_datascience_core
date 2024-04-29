@@ -115,7 +115,7 @@ class PandasStandardScaler(JDSTDataPrep):
         return self.transform(data)
 
     def reverse(self, data):
-        return self.inverse_tranform(data)
+        return self.inverse_transform(data)
 
     def fit(self, data):
         # Since we do not modify data here, we can avoid a copy using np.asarray
@@ -145,10 +145,19 @@ class PandasStandardScaler(JDSTDataPrep):
     def inverse_transform(self, data):
         if self.mean is None:
             raise RuntimeError()
+        data_view = np.array(data, copy=not self.config['inplace'])
         if self.config['axis'] is not None:
-            data_rotated = np.rollaxis(data, self.config['axis'])
-        else: data_rotated = data
-        return data * self.scale + self.mean
+            data_rotated = np.rollaxis(data_view, self.config['axis'])
+        else: data_rotated = data_view
+        data_rotated *= self.scale
+        data_rotated += self.mean
+        
+        if self.config['inplace']:
+            return
+
+        output = data.copy()
+        output.values[:] = data_view
+        return output
 
     def save_data(self, data):
         super().save_data()

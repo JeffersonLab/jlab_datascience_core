@@ -111,6 +111,12 @@ class TestPandasStandardScalerv0(unittest.TestCase):
         finally:
             shutil.rmtree(save_path)
 
+    def test_reverse_scaling(self):
+        prep = make(prep_id)
+        scaled_data = prep.run(self.data)
+        unscaled_data = prep.reverse(scaled_data)
+
+        self.assertTrue(np.allclose(self.data, unscaled_data))
 
 # Run this file via: python utest_csv_parser_v0.py
 if __name__ == "__main__":
