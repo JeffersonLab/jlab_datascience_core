@@ -4,10 +4,13 @@ import logging
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import argparse
+import shutil
 import sys
 import os
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+test_log = logging.Logger('test_logger')
+
 rng = np.random.default_rng(seed=42)
 parser_id = 'CSVParser_v0'
 
@@ -125,7 +128,27 @@ class TestCSVParserv0(unittest.TestCase):
             self.assertTrue('GMES' in column)
         self.assertIsInstance(output.index, pd.DatetimeIndex)
 
+    def test_save_load(self):
+        print('*****Save/Load Test*****\n')
+
+        parser = make(parser_id, config=dict(filepaths=self.path, read_kwargs={'usecols': self.columns}))
+        output = parser.load_data()
+        save_path = './temp_parser'
+        try:
+            parser.save(save_path)
+            new_parser = make(parser_id)
+            new_parser.load(save_path)
+            new_output = new_parser.load_data()
+            for col in output.columns:
+                with self.subTest(col=col):
+                    self.assertTrue(np.allclose(output[col], new_output[col]))
+        finally:
+            shutil.rmtree(save_path)
+        pass
 
 # Run this file via: python utest_csv_parser_v0.py
 if __name__ == "__main__":
+    argv = len(sys.argv) > 1 and sys.argv[1]
+    loglevel = logging.DEBUG if argv == '-v' else logging.WARNING
+    logging.basicConfig(stream=sys.stdout, level=loglevel)
     unittest.main()
