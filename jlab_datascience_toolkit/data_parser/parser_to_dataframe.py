@@ -30,8 +30,9 @@ class Parser2DataFrame(JDSTDataParser):
             Format of files to parse. Currently supports csv, feather, json
             and pickle. Defaults to csv
         `read_kwargs: dict = {}`
-            Arguments to be passed 
+            Arguments to be passed to the read function determined by `file_format`
         `concat_kwargs: dict = {}`
+            Arguments to be passed to pd.concat()
 
     Attributes
     ----------
