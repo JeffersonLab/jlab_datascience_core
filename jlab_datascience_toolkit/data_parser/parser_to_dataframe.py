@@ -1,4 +1,5 @@
 from jlab_datascience_toolkit.core.jdst_data_parser import JDSTDataParser
+from jlab_datascience_toolkit.utils.io import save_config, load_config
 from pathlib import Path
 import pandas as pd
 import logging
@@ -119,11 +120,7 @@ class Parser2DataFrame(JDSTDataParser):
             path (str): Path to folder containing module files.
         """
         base_path = Path(path)
-        with open(base_path.joinpath('config.yaml'), 'r') as f:
-            loaded_config = yaml.safe_load(f)
-
-        self.config.update(loaded_config)
-        self.setup()
+        self.load_config(base_path)
 
     def save(self, path: str):
         """Save the entire module state to a folder at `path`
@@ -133,8 +130,7 @@ class Parser2DataFrame(JDSTDataParser):
         """
         save_dir = Path(path)
         os.makedirs(save_dir)
-        with open(save_dir.joinpath('config.yaml'), 'w') as f:
-            yaml.safe_dump(self.config, f)
+        self.save_config(save_dir)
 
     def load_data(self) -> pd.DataFrame:
         """ Loads all files listed in `config['filepaths']` 
@@ -166,13 +162,19 @@ class Parser2DataFrame(JDSTDataParser):
         
         return output
 
-    def load_config(self, path: str):
-        parser_log.debug('Calling load()...')
-        return self.load(path)
+    def load_config(self, path: Path | str):
+        self.config.update(load_config(path))
+        self.setup()
 
-    def save_config(self, path: str):
-        parser_log.debug('Calling save()...')
-        return self.save(path)
+    def save_config(self, path: Path | str, overwrite=False):
+        """ Saves this modules configuration to the file specified by path
+            If path is a directory, we save the configuration as config.yaml
+
+        Args:
+            path (Path | str): Location for saved configuration. Either a filename or directory is 
+                acceptable.
+        """
+        save_config(self.config, path, overwrite)
     
     def save_data(self):
         return super().save_data()

@@ -1,4 +1,5 @@
 from jlab_datascience_toolkit.core.jdst_data_prep import JDSTDataPrep
+from jlab_datascience_toolkit.utils.io import save_config, load_config
 from pathlib import Path
 import pandas as pd
 import numpy as np
@@ -62,17 +63,14 @@ class PandasStandardScaler(JDSTDataPrep):
         self.load_config(path)
         self.load_internal_state(path)
 
-    def save_config(self, path):
+    def save_config(self, path, overwrite=False):
         """Save the module configuration to a folder at `path`
 
         Args:
             path (str): Location to save the module config yaml file
         """
         save_dir = Path(path)
-        if not save_dir.exists():
-            os.makedirs(save_dir)
-        with open(save_dir.joinpath('config.yaml'), 'w') as f:
-            yaml.safe_dump(self.config, f)
+        save_config(self.config, save_dir, overwrite)
 
     def load_config(self, path):
         """ Load the entire module state from `path`
@@ -81,10 +79,7 @@ class PandasStandardScaler(JDSTDataPrep):
             path (str): Path to folder containing module files.
         """
         base_path = Path(path)
-        with open(base_path.joinpath('config.yaml'), 'r') as f:
-            loaded_config = yaml.safe_load(f)
-
-        self.config.update(loaded_config)
+        self.config.update(load_config(base_path))
         self.setup()
 
     def save_internal_state(self, path):
