@@ -48,37 +48,3 @@ def load_yaml_config(path: str | Path):
 
     with open(path, 'r') as f:
         return yaml.safe_load(f)
-
-
-if __name__ == '__main__':
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-
-    config = {'name': 'test', 'scale': 1, 'list_example': [0.1, 1.2, 2.3]}
-
-    test_path = tempfile.mkdtemp()
-    io_log.info(f'Made directory at {test_path}')
-
-    # Testing with fake directory
-    save_yaml_config(config, test_path, False)
-
-    # File should exist now, so we should get an error
-    try: 
-        save_yaml_config(config, test_path, False)
-    except:
-        io_log.info('save_yaml_config() raised error')
-
-    test_file = tempfile.mkstemp(suffix='.yaml')[1]
-    io_log.info(f'Made file at {test_file}')
-
-    # File should exist now, so we should get an error
-    try: 
-        save_yaml_config(config, test_file, False)
-    except:
-        io_log.info('save_yaml_config() raised error')
-    
-    # With overwrite flag, we should write the config to the file
-    save_yaml_config(config, test_file, True)
-
-    # Log saved configurations
-    io_log.info(f'Saved config == {load_yaml_config(test_file)}')
-    io_log.info(f'Saved config == {load_yaml_config(Path(test_path).joinpath("config.yaml"))}')
