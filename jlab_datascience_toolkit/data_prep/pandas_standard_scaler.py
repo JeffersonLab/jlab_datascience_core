@@ -14,11 +14,11 @@ def _fix_small_scales(scale, epsilon):
     """ Updates scale parameters below epsilon to 1 to prevent issues with small divisors
 
     Args:
-        scale (_type_): Scale parameters to (potentially) fix
-        epsilon (_type_): Smallest allowable value for scale parameters
+        scale (array_like): Scale parameters to (potentially) fix
+        epsilon (float): Smallest allowable value for scale parameters
 
     Returns:
-        _type_: Updated scale parameters
+        array_like: Updated scale parameters
     """
     return np.where(scale < epsilon, 1, scale)
 
@@ -26,17 +26,17 @@ class PandasStandardScaler(JDSTDataPrep):
     """ Module performs standard scaling on Pandas DataFrames.
 
     Intialization arguments: 
-        `config: dict`
+        config: dict
 
     Optional configuration keys: 
-        `axis: int = 0`
+        axis: int = 0
             Axis to perform scaling on. Accepts 0,1 or None. Defaults to 0. 
-        `epsilon: float = 1e-7,
+        epsilon: float = 1e-7
             Smallest allowable value for the standard deviation. Defaults to 1e-7.
             If smaller than epsilon, the output variance will not be modified.
             This avoids exploding small noise variance values.
-        `inplace: bool = False`
-            If true, operations modify the original DataFrame. Defaults to False.
+        inplace: bool = False
+            If True, operations modify the original DataFrame. Defaults to False.
 
     Attributes
     ----------
@@ -56,18 +56,17 @@ class PandasStandardScaler(JDSTDataPrep):
     load_config(path)
         Loads a configuration file. Scaler parameters will be fit to new data.
     save_config(path)
-        Calls save(path)
+        Calls `save(path)`
     run(data)
         Performs standard scaling on `data`. If the scaler has not been previously
         fit, the scaler parameters will be fit to `data`. Otherwise, the scaling
-        will utilize mean and variance information from the most recent fit() call.
+        will utilize mean and variance information from the most recent `fit()` call.
     fit(data)
         Sets scaler parameters for mean and variance based on `data`
     reverse(data)
         Performs inverse scaling on `data`. 
     save_data(path)
         Does nothing.
-    
 
     """
     def __init__(self, config: dict = None, registry_config: dict = None):
@@ -168,6 +167,14 @@ class PandasStandardScaler(JDSTDataPrep):
         return self.transform(data)
 
     def reverse(self, data: pd.DataFrame):
+        """ Performs inverse scaling on `data`
+
+        Args:
+            data (pd.DataFrame): Data to perform inverse scaling on.
+
+        Returns:
+            pd.DataFrame: Inverse scaled DataFrame
+        """
         return self.inverse_transform(data)
 
     def fit(self, data: pd.DataFrame):
