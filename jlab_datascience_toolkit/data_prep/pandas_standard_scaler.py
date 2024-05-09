@@ -8,10 +8,11 @@ import inspect
 import yaml
 import os
 
-prep_log = logging.getLogger('Prep Logger')
+prep_log = logging.getLogger("Prep Logger")
+
 
 def _fix_small_scales(scale, epsilon):
-    """ Updates scale parameters below epsilon to 1 to prevent issues with small divisors
+    """Updates scale parameters below epsilon to 1 to prevent issues with small divisors
 
     Args:
         scale (array_like): Scale parameters to (potentially) fix
@@ -22,15 +23,16 @@ def _fix_small_scales(scale, epsilon):
     """
     return np.where(scale < epsilon, 1, scale)
 
-class PandasStandardScaler(JDSTDataPrep):
-    """ Module performs standard scaling on Pandas DataFrames.
 
-    Intialization arguments: 
+class PandasStandardScaler(JDSTDataPrep):
+    """Module performs standard scaling on Pandas DataFrames.
+
+    Intialization arguments:
         config: dict
 
-    Optional configuration keys: 
+    Optional configuration keys:
         axis: int = 0
-            Axis to perform scaling on. Accepts 0,1 or None. Defaults to 0. 
+            Axis to perform scaling on. Accepts 0,1 or None. Defaults to 0.
         epsilon: float = 1e-7
             Smallest allowable value for the standard deviation. Defaults to 1e-7.
             If smaller than epsilon, the output variance will not be modified.
@@ -64,18 +66,15 @@ class PandasStandardScaler(JDSTDataPrep):
     fit(data)
         Sets scaler parameters for mean and variance based on `data`
     reverse(data)
-        Performs inverse scaling on `data`. 
+        Performs inverse scaling on `data`.
     save_data(path)
         Does nothing.
 
     """
+
     def __init__(self, config: dict = None, registry_config: dict = None):
         # Set default config
-        self.config = dict(
-            axis = 0,
-            epsilon = 1e-7,
-            inplace = False
-        )
+        self.config = dict(axis=0, epsilon=1e-7, inplace=False)
 
         if registry_config is not None:
             self.config.update(registry_config)
@@ -93,11 +92,11 @@ class PandasStandardScaler(JDSTDataPrep):
         self.var = None
         self.scale = None
         self.n_samples = 0
-        
+
     def get_info(self):
-        """ Prints this module's docstring. """
+        """Prints this module's docstring."""
         print(inspect.getdoc(self))
-    
+
     def save(self, path: str):
         """Save entire module to a folder at `path`
 
@@ -112,25 +111,25 @@ class PandasStandardScaler(JDSTDataPrep):
         """Load entire saved module from `path`
 
         Args:
-            path (str): Directory to load module from. Should include a config.yaml 
+            path (str): Directory to load module from. Should include a config.yaml
                 and scaler_state.npz files.
         """
         self.load_config(path)
         self.load_internal_state(path)
 
-    def save_config(self, path: str, overwrite:bool=False):
+    def save_config(self, path: str, overwrite: bool = False):
         """Save the module configuration to a folder at `path`
 
         Args:
             path (str): Location to save the module config yaml file
-            overwrite (bool, optional): If True, overwrites file at path if it exists. 
+            overwrite (bool, optional): If True, overwrites file at path if it exists.
                 Defaults to False.
         """
         save_dir = Path(path)
         save_yaml_config(self.config, save_dir, overwrite)
 
     def load_config(self, path: str):
-        """ Load the entire module state from `path`
+        """Load the entire module state from `path`
 
         Args:
             path (str): Path to folder containing module files.
@@ -141,33 +140,30 @@ class PandasStandardScaler(JDSTDataPrep):
 
     def save_internal_state(self, path: str):
         internal_state = dict(
-            mean = self.mean,
-            var = self.var,
-            scale = self.scale,
-            n_samples = self.n_samples
+            mean=self.mean, var=self.var, scale=self.scale, n_samples=self.n_samples
         )
         save_dir = Path(path)
         if not save_dir.exists():
             os.makedirs(save_dir)
-        np.savez(save_dir.joinpath('scaler_state.npz'), **internal_state)
+        np.savez(save_dir.joinpath("scaler_state.npz"), **internal_state)
 
     def load_internal_state(self, path: str):
         save_dir = Path(path)
-        internal_state = np.load(save_dir.joinpath('scaler_state.npz'))
-        self.mean = internal_state['mean']
-        self.var = internal_state['var']
-        self.scale = internal_state['scale']
-        self.n_samples = internal_state['n_samples']
+        internal_state = np.load(save_dir.joinpath("scaler_state.npz"))
+        self.mean = internal_state["mean"]
+        self.var = internal_state["var"]
+        self.scale = internal_state["scale"]
+        self.n_samples = internal_state["n_samples"]
 
     def run(self, data: pd.DataFrame):
         if self.mean is None:
-            prep_log.debug('Fitting new data on run()')
+            prep_log.debug("Fitting new data on run()")
             self.fit(data)
 
         return self.transform(data)
 
     def reverse(self, data: pd.DataFrame):
-        """ Performs inverse scaling on `data`
+        """Performs inverse scaling on `data`
 
         Args:
             data (pd.DataFrame): Data to perform inverse scaling on.
@@ -178,29 +174,30 @@ class PandasStandardScaler(JDSTDataPrep):
         return self.inverse_transform(data)
 
     def fit(self, data: pd.DataFrame):
-        """ Sets internal scaler parameters based on the mean and variance of `data`
+        """Sets internal scaler parameters based on the mean and variance of `data`
 
         Args:
             data (pd.DataFrame): DataFrame used to fit the scaler
         """
         # Since we do not modify data here, we can avoid a copy using np.asarray
         data_view = np.asarray(data)
-        self.mean = np.mean(data_view, axis=self.config['axis'])
-        self.var  = np.var(data_view, axis=self.config['axis'])
-        self.scale = _fix_small_scales(np.sqrt(self.var), self.config['epsilon'])
+        self.mean = np.mean(data_view, axis=self.config["axis"])
+        self.var = np.var(data_view, axis=self.config["axis"])
+        self.scale = _fix_small_scales(np.sqrt(self.var), self.config["epsilon"])
         self.n_samples = data.shape[0]
 
     def transform(self, data):
         if self.mean is None:
             raise RuntimeError()
-        data_view = np.array(data, copy=not self.config['inplace'])
-        if self.config['axis'] is not None:
-            data_rotated = np.rollaxis(data_view, self.config['axis'])
-        else: data_rotated = data_view
+        data_view = np.array(data, copy=not self.config["inplace"])
+        if self.config["axis"] is not None:
+            data_rotated = np.rollaxis(data_view, self.config["axis"])
+        else:
+            data_rotated = data_view
         data_rotated -= self.mean
         data_rotated /= self.scale
-        
-        if self.config['inplace']:
+
+        if self.config["inplace"]:
             return
 
         output = data.copy()
@@ -210,14 +207,15 @@ class PandasStandardScaler(JDSTDataPrep):
     def inverse_transform(self, data):
         if self.mean is None:
             raise RuntimeError()
-        data_view = np.array(data, copy=not self.config['inplace'])
-        if self.config['axis'] is not None:
-            data_rotated = np.rollaxis(data_view, self.config['axis'])
-        else: data_rotated = data_view
+        data_view = np.array(data, copy=not self.config["inplace"])
+        if self.config["axis"] is not None:
+            data_rotated = np.rollaxis(data_view, self.config["axis"])
+        else:
+            data_rotated = data_view
         data_rotated *= self.scale
         data_rotated += self.mean
-        
-        if self.config['inplace']:
+
+        if self.config["inplace"]:
             return
 
         output = data.copy()
