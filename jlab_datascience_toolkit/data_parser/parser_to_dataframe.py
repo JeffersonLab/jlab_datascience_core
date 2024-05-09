@@ -1,5 +1,5 @@
 from jlab_datascience_toolkit.core.jdst_data_parser import JDSTDataParser
-from jlab_datascience_toolkit.utils.io import save_config, load_config
+from jlab_datascience_toolkit.utils.io import save_yaml_config, load_yaml_config
 from pathlib import Path
 import pandas as pd
 import logging
@@ -163,7 +163,7 @@ class Parser2DataFrame(JDSTDataParser):
         return output
 
     def load_config(self, path: Path | str):
-        self.config.update(load_config(path))
+        self.config.update(load_yaml_config(path))
         self.setup()
 
     def save_config(self, path: Path | str, overwrite=False):
@@ -174,7 +174,7 @@ class Parser2DataFrame(JDSTDataParser):
             path (Path | str): Location for saved configuration. Either a filename or directory is 
                 acceptable.
         """
-        save_config(self.config, path, overwrite)
+        save_yaml_config(self.config, path, overwrite)
     
     def save_data(self):
         return super().save_data()
