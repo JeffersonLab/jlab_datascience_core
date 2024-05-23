@@ -1,0 +1,31 @@
+model_config:
+  class_name: Sequential
+  config:
+    dtype: float32
+    layers:
+    - class_name: Dense
+      config:
+        activation: relu
+        units: 128
+      module: keras.layers
+      registered_name: null
+    - class_name: Dense
+      config:
+        units: 1
+      module: keras.layers
+      registered_name: null
+    name: basic_model
+    trainable: true
+  module: keras
+  registered_name: null
+compile_config:
+  loss:
+    class_name: BinaryCrossentropy
+    config:
+      from_logits: true
+    module: keras.losses
+    registered_name: null
+  metrics:
+  - accuracy
+  optimizer: adam
+
