@@ -2,10 +2,14 @@ from jlab_datascience_toolkit.core.jdst_model import JDSTModel
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
+import gc
+import logging
+import yaml
 from sklearn.model_selection import train_test_split
 from keras.callbacks import ModelCheckpoint
-from evms_ultra_dev.utils.architectures.keras_cnn_ae_architecture import KerasCNNAEArchitecture
-from evms_ultra_dev.utils.keras_callbacks.keras_early_stopping import KerasEarlyStopping
+from jlab_datascience_toolkit.utils.architectures.keras_cnn_ae_architecture import KerasCNNAEArchitecture
+from jlab_datascience_toolkit.utils.keras_callbacks.keras_early_stopping import KerasEarlyStopping
+from jlab_datascience_toolkit.utils.keras_callbacks.keras_garbage_handler import KerasGarbageHandler
 
 class KerasCNNAE(keras.Model,JDSTModel):
     '''
@@ -90,9 +94,11 @@ class KerasCNNAE(keras.Model,JDSTModel):
         # TRAINING:
         self.n_epochs = self.config['n_epochs']
         self.batch_size = self.config['batch_size']
+        self.validation_split = self.config['validation_split']
+        self.verbosity = self.config['verbosity']
        
         # Add early stopping callback (if config is properly set):
-        self.early_stopping = KerasEarlyStopping(self.config)
+        self.early_stopping = KerasEarlyStopping(self.config).get_callback()
 
         # BUILD THE MODEL:
         # Check if the model already exists and just needs to be loaded:
@@ -194,16 +200,16 @@ class KerasCNNAE(keras.Model,JDSTModel):
         if self.optimizer_str.lower() == "sgd":
             self.optimizer = keras.optimizers.SGD(self.learning_rate)
 
-        if self.loss_fn_str.lower() == "mse":
+        if self.loss_function_str.lower() == "mse":
             self.loss_fn = keras.losses.MeanSquaredError()
 
-        if self.loss_fn_str.lower() == "mae":
+        if self.loss_function_str.lower() == "mae":
             self.loss_fn = keras.losses.MeanAbsoluteError()
 
-        if self.loss_fn_str.lower() == "huber":
+        if self.loss_function_str.lower() == "huber":
             self.loss_fn = keras.losses.Huber()
         
-        if self.loss_fn_str.lower() == "logit_bce":
+        if self.loss_function_str.lower() == "logit_bce":
             def loss_func(x,x_logit):
                 return tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(logits=x_logit, labels=x))
             
@@ -291,7 +297,7 @@ class KerasCNNAE(keras.Model,JDSTModel):
         x_train, x_test = train_test_split(x,test_size=validation_split)
 
         # Handle callbacks:
-        ae_callbacks = [tf.keras.callbacks.TerminateOnNaN(),GarbageHandler()]
+        ae_callbacks = [tf.keras.callbacks.TerminateOnNaN(),KerasGarbageHandler()]
         if self.early_stopping is not None:
             ae_callbacks.append(self.early_stopping)
 
@@ -314,8 +320,6 @@ class KerasCNNAE(keras.Model,JDSTModel):
             
         return outputs
     #****************************
-
-
 
     # Store / load  the network:
     #****************************
@@ -341,6 +345,41 @@ class KerasCNNAE(keras.Model,JDSTModel):
             self.encoder.set_weights(encoder_weights)
             self.decoder.set_weights(decoder_weights)
     #****************************
+
+    # Provide information about this module:
+    #*********************************************
+    def get_info(self):
+        print(inspect.getdoc(self))
+    #*********************************************
+
+    # Handle configurations:
+    #*********************************************
+    # Load the config:
+    def load_config(self,path_to_cfg,user_config):
+        with open(path_to_cfg, 'r') as file:
+            cfg = yaml.safe_load(file)
+        
+        # Overwrite config with user settings, if provided
+        try:
+            if bool(user_config):
+              #++++++++++++++++++++++++
+              for key in user_config:
+                cfg[key] = user_config[key]
+              #++++++++++++++++++++++++
+        except:
+            logging.exception(">>> " + self.module_name +": Invalid user config. Please make sure that a dictionary is provided <<<") 
+
+        return cfg
+    
+    #-----------------------------
+
+    # Store the config:
+    def save_config(self,path_to_config):
+        with open(path_to_config, 'w') as file:
+           yaml.dump(self.config, file)
+    #*********************************************
+
+
     
     
     
