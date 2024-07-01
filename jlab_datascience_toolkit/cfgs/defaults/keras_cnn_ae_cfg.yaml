@@ -4,6 +4,7 @@ load_model_loc: null
 model_store_format: ".h5"
 compile_loaded_model: False
 # Model architecture:
+image_dimensions: null
 max_pooling: null
 conv_architecture: [64,32]
 conv_activations: ["relu","relu"]

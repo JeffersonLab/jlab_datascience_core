@@ -57,6 +57,7 @@ class UTestKerasCNNAE(unittest.TestCase):
         # And maybe add some user specific values:
         use_conv_latent_layer = False
         user_cfg = {
+            'image_dimensions':(self.data.shape[1],self.data.shape[2],self.data.shape[3]),
             'n_epochs': 10,
             'dense_architecture':[3,3],
             'dense_activations':['relu']*2,
@@ -73,7 +74,7 @@ class UTestKerasCNNAE(unittest.TestCase):
         print("Set up model...")
 
         # Set the model:
-        model = models.make(model_id,path_to_cfg=cfg_loc,shape=self.data.shape,user_config=user_cfg)
+        model = models.make(model_id,path_to_cfg=cfg_loc,user_config=user_cfg)
 
         print("...done!")
         print(" ") 

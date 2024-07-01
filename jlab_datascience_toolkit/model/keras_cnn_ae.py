@@ -19,7 +19,7 @@ class KerasCNNAE(keras.Model,JDSTModel):
 
     # Initialize:
     #****************************
-    def __init__(self,path_to_cfg,shape,user_config={}):
+    def __init__(self,path_to_cfg,user_config={}):
         super(KerasCNNAE, self).__init__()
 
         # Set the name specific to this module:
@@ -43,7 +43,7 @@ class KerasCNNAE(keras.Model,JDSTModel):
         self.compile_loaded_model = self.config['compile_loaded_model']
 
         # Get the image dimensions --> Important for setting the network architecture properly:
-        self.image_dims = (shape[1],shape[2],shape[3])
+        self.image_dims = self.config['image_dimensions']
 
         # NETWORK ARCHITECTURE AND FEATURES:
 
@@ -76,7 +76,7 @@ class KerasCNNAE(keras.Model,JDSTModel):
 
         # Response of decoder output layer:
         output_activation = self.config['output_activation']
-        output_filter = shape[3]
+        output_filter = self.image_dims[2]
         output_kernel_size = self.config['output_kernel_size']
         output_strides = self.config['output_strides']
 
