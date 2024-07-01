@@ -21,3 +21,11 @@ register(
 )
 
 from jlab_datascience_toolkit.data_parser.image_to_numpy_parser import ImageToNumpyParser
+
+# MNIST Data parser:
+register(
+    id="MNISTDataParser_v0",
+    entry_point="jlab_datascience_toolkit.data_parser.mnist_data_parser:MNISTDataParser"
+)
+
+from jlab_datascience_toolkit.data_parser.mnist_data_parser import MNISTDataParser
