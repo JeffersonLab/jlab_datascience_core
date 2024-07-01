@@ -16,8 +16,3 @@ class JDSTModel(JDSTModule,ABC):
     def predict(self):
         raise NotImplementedError
     
-    # Run a small analysis (e.g. determine ROC-Curve, MSE,...)
-    @abstractmethod
-    def analysis(self):
-        raise NotImplementedError
-    

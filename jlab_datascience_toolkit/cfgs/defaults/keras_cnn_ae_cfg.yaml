@@ -1,0 +1,34 @@
+precision: "float32"
+# Model storage / writing to file:
+load_model_loc: None
+model_store_format: ".h5"
+compile_loaded_model: False
+# Model architecture:
+max_pooling: None
+conv_architecture: [64,32]
+conv_activation: ["relu","relu"]
+conv_kernel_inits: ["he_normal","he_normal"]
+conv_bias_inits: ["zeros","zeros"]
+kernel_sizes: [3,3]
+strides: [2,2]
+dense_architecture: []
+dense_activations: []
+dense_kernel_inits: []
+dense_bias_inits: []
+latent_dim: 10
+latent_space_is_2d: False
+decoder_conv_reshape_units: 32
+output_activation: "linear"
+output_kernel_size: 3
+output_strides: 1
+# Optimizer and loss function:
+learning_rate: 1e-4
+optimizer: "adam"
+loss_function: "mse"
+# Training the model:
+n_epochs: 5
+batch_size: 32
+validation_split: 0.1
+verbosity: "auto"
+
+
