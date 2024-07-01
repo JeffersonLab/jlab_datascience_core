@@ -1,0 +1,8 @@
+output_loc: "residual_analysis_results"
+reduction_mode: "mean"
+reduction_axis: 3
+imageplot_figsize: [18,8]
+imageplot_noaxes: True
+movie_duration: 1.0
+real_data_name: 'x_real'
+rec_data_name: 'x_rec'
