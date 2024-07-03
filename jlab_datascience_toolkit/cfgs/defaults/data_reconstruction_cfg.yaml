@@ -1,0 +1,7 @@
+output_loc: null
+data_store_name: "rec_data"
+buffer_size: 100
+n_analysis_samples: 10
+analysis_sample_size: 10
+data_names: ['x_orig','x_rec']
+record_original_data: False

@@ -16,3 +16,8 @@ class JDSTModel(JDSTModule,ABC):
     def predict(self):
         raise NotImplementedError
     
+    # Get the model (tf- / pytorch object with layers, weights, activations, etc.)
+    @abstractmethod
+    def get_model(self):
+        return NotImplementedError
+    

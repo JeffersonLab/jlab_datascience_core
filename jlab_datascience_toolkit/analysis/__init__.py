@@ -7,3 +7,11 @@ register(
 )
 
 from jlab_datascience_toolkit.analysis.residual_analyzer import ResidualAnalyzer
+
+# Data reconstruction:
+register(
+    id="DataReconstruction_v0",
+    entry_point="jlab_datascience_toolkit.analysis.data_reconstruction:DataReconstruction"
+)
+
+from jlab_datascience_toolkit.analysis.data_reconstruction import DataReconstruction

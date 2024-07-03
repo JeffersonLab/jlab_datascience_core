@@ -5,6 +5,7 @@ import numpy as np
 import gc
 import logging
 import yaml
+import inspect
 from sklearn.model_selection import train_test_split
 from keras.callbacks import ModelCheckpoint
 from jlab_datascience_toolkit.utils.architectures.keras_cnn_ae_architecture import KerasCNNAEArchitecture
@@ -377,6 +378,12 @@ class KerasCNNAE(keras.Model,JDSTModel):
     def save_config(self,path_to_config):
         with open(path_to_config, 'w') as file:
            yaml.dump(self.config, file)
+    #*********************************************
+    
+    # Get the encoder / decoder models themselves:
+    #*********************************************
+    def get_model(self,x=None):
+        return [self.encoder,self.decoder]
     #*********************************************
 
 
