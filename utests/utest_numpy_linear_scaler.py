@@ -39,7 +39,7 @@ class UTestNumpyLinearScaler(unittest.TestCase):
         this_file_loc = os.path.dirname(__file__)
         cfg_loc = os.path.join(this_file_loc,'../jlab_datascience_toolkit/cfgs/defaults/numpy_linear_scaler_cfg.yaml')
         param_store_loc = this_file_loc + '/numpy_linear_scaler_params'
-        scaler_cfg = {'A':2,'B':-10,'store_loc':param_store_loc}
+        scaler_cfg = {'A':2,'B':-10,'store_loc':param_store_loc,'exclude_data':['test0']}
         npy_scaler = preps.make("NumpyLinearScaler_v0",path_to_cfg=cfg_loc,user_config=scaler_cfg)
         
         # Print the module info:
@@ -56,7 +56,7 @@ class UTestNumpyLinearScaler(unittest.TestCase):
         print("...done!")
         print("  ")
 
-         # Undo the scaling:
+        # Undo the scaling:
         print("Reverse scaling...")
 
         unscaled_data = npy_scaler.reverse(scaled_data)
@@ -77,6 +77,49 @@ class UTestNumpyLinearScaler(unittest.TestCase):
         # Check if the unscaled data has the same limits as the original test data:
         if round(np.min(test_data),1) == round(np.min(unscaled_data),1) and round(np.max(test_data),1) == round(np.max(unscaled_data),1):
             pass_range_check_2 = True 
+
+        print("...done!")
+        print("  ")
+
+        # Repeat analysis, but use data dictionaries instead:
+        print("Create dictionary with test data...")
+
+        dict_data = {
+            'test0':np.zeros_like(test_data),
+            'test1':test_data
+        }
+
+        print("...done!")
+        print("  ")
+
+        print("Pass dictionary through linear scaler...")
+ 
+        scaled_dict_data = npy_scaler.run(dict_data)
+
+        print("...done!")
+        print("  ")
+
+        print("And reverse everything...")
+
+        unscaled_dict_data = npy_scaler.reverse(scaled_dict_data)
+
+        print("...done!")
+        print("  ")
+
+        # Run another sanity check on the dictionary data:
+        print("Run another dimension check...")
+        
+        pass_dict_range_check_1 = False
+        pass_dict_range_check_2 = False
+        
+        # Check scaled data:
+        if round(np.min(scaled_dict_data['test1']),1) == 0.0 and round(np.max(scaled_dict_data['test1'])) == 10.0:
+            pass_dict_range_check_1 = True
+
+        # Check if the unscaled data has the same limits as the original test data:
+        if round(np.min(dict_data['test1']),1) == round(np.min(unscaled_dict_data['test1']),1) and round(np.max(dict_data['test1']),1) == round(np.max(unscaled_dict_data['test1']),1):
+            pass_dict_range_check_2 = True 
+
 
         print("...done!")
         print("  ")
@@ -119,7 +162,7 @@ class UTestNumpyLinearScaler(unittest.TestCase):
         print("...done!")
         print("  ")
 
-        self.assertTrue(pass_range_check_1 & pass_range_check_2 & pass_checkpointing & passTypeChecker)
+        self.assertTrue(pass_range_check_1 & pass_range_check_2 & pass_checkpointing & passTypeChecker & pass_dict_range_check_1 & pass_dict_range_check_2)
 
         print("Have a great day!")
     #*****************************************

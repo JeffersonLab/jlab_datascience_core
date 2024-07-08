@@ -1,5 +1,6 @@
 precision: "float32"
 # Model storage / writing to file:
+store_model_loc: null
 load_model_loc: null
 model_store_format: ".h5"
 compile_loaded_model: False

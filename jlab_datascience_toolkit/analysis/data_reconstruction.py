@@ -14,6 +14,13 @@ class DataReconstruction(JDSTAnalysis):
 
     where model can be a (variational) Autoencoder, U-Net, Diffusion model,...
     The data here is processed via the tf.dataset system, in order to efficiently handle large data sets.
+
+    Input(s):
+    i) Numpy arrays / images
+    ii) A trained model
+
+    Output(s):
+    i) Dictionary with reconstructed images and (optional) original images
     '''
 
      # Initialize:

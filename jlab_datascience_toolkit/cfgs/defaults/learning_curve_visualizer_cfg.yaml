@@ -1,0 +1,9 @@
+plots: {'plot1':['loss','val_loss']} 
+fig_size: [12,8]
+line_width: 3.0
+font_size: 20.0
+leg_font_size: 15.0
+plot_legends: {'plot1':['Training','Validation']}
+plot_labels: {'plot1':['Epochs','Loss']}
+plot_names: {'plot1':losses}
+output_loc: 'results'

@@ -9,7 +9,7 @@ class NumpyLinearScaler(JDSTDataPrep):
     """Simplified linear scaler
 
     What this module does:
-    "i) Apply the transformation: A * X + B, where A, B are constants and X is a numpy array / image
+    "i) Apply the transformation: A * X + B, where A, B are constants and X is either a numpy array / image or a dictionary containing numpy arrays / images
 
     Input(s):
     i) Scale A
@@ -18,7 +18,7 @@ class NumpyLinearScaler(JDSTDataPrep):
     iv) dtype (int,float,etc.) for the reverse scaled data
 
     Output(s):
-    i) Scaled image
+    i) Scaled image or dict with scaled images
     """
 
     # Initialize:
@@ -29,6 +29,10 @@ class NumpyLinearScaler(JDSTDataPrep):
         
         # Load the configuration:
         self.config = self.load_config(path_to_cfg,user_config)
+
+        # Check for data that shall be excluded from this module:
+        # Note: This only works if the input data is a dictionary
+        self.exclude_data = self.config['exclude_data']
  
         # Save this config, if a path is provided:
         if 'store_cfg_loc' in self.config:
@@ -71,27 +75,62 @@ class NumpyLinearScaler(JDSTDataPrep):
     # Run a type chec:
     #*********************************************
     def type_check(self,data):
-        if isinstance(data,np.ndarray) == False:
-            logging.error(">>> " + self.module_name + ": Data is not a numpy array <<<")
-            return False
+        if isinstance(data,np.ndarray) == True:
+            return "numpy"
+            
+        elif isinstance(data,dict) == True:
+                # Make sure that every element in the dictionary is a numpy array:
+                pass_type_check = True
+                #+++++++++++++++++
+                for key in data:
+                   if isinstance(data[key],np.ndarray) == False and key not in self.exclude_data:
+                       pass_type_check = False
+                #+++++++++++++++++
+
+                if pass_type_check:
+                   return "dict"
+                
+                logging.error(">>> " + self.module_name + ": Dictionary does not contain numby data<<<")
+                return "no_implemented"
+        else:
+            logging.error(f">>> {self.module_name}: Data type {type(data)} is neither numpy array nor dictionary with numpy data<<<")
+            return "no_implemented"
         
-        return True
+        
     #*********************************************
     
     # Run and reverse the scaling: 
     #*********************************************
     # Scale:
     def run(self,data):
-        if self.type_check(data) == True:
+        if self.type_check(data).lower() == "numpy":
            return (data * self.config['A'] + self.config['B']).astype(self.config['run_dtype'])
-        
+        elif self.type_check(data).lower() == "dict":
+            result_dict = {}
+            #+++++++++++++++++++
+            for key in data:
+                if key not in self.exclude_data:
+                   result_dict[key] = (data[key] * self.config['A'] + self.config['B']).astype(self.config['run_dtype'])
+            #+++++++++++++++++++
+
+            return result_dict
     #-----------------------------
 
     # Undo scaling:
     def reverse(self,data):
-        if self.type_check(data) == True:
+        if self.type_check(data).lower() == "numpy":
             reversed_data = (data - self.config['B']) / self.config['A']
             return reversed_data.astype(self.config['reverse_dtype'])
+        elif self.type_check(data).lower() == "dict":
+            result_dict = {}
+            #+++++++++++++++++++
+            for key in data:
+                if key not in self.exclude_data:
+                   reversed_data = (data[key] - self.config['B']) / self.config['A']
+                   result_dict[key] = reversed_data.astype(self.config['reverse_dtype'])
+            #+++++++++++++++++++
+
+            return result_dict
     #*********************************************
 
      # Save the data:

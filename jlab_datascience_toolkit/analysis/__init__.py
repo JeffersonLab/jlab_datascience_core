@@ -15,3 +15,11 @@ register(
 )
 
 from jlab_datascience_toolkit.analysis.data_reconstruction import DataReconstruction
+
+# Learning Curve Visualizer:
+register(
+    id="LearningCurveVisualizer_v0",
+    entry_point="jlab_datascience_toolkit.analysis.learning_curve_visualizer:LearningCurveVisualizer"
+)
+
+from jlab_datascience_toolkit.analysis.learning_curve_visualizer import LearningCurveVisualizer

@@ -4,3 +4,4 @@ data_store_loc: ""
 store_loc: ""
 run_dtype: "float32"
 reverse_dtype: "float32"
+exclude_data: []

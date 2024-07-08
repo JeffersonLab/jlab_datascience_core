@@ -5,6 +5,7 @@ import numpy as np
 import gc
 import logging
 import yaml
+import os
 import inspect
 from sklearn.model_selection import train_test_split
 from keras.callbacks import ModelCheckpoint
@@ -39,6 +40,7 @@ class KerasCNNAE(keras.Model,JDSTModel):
         self.ae_architecture = KerasCNNAEArchitecture(precision)
         
         # Model storage / loading and model format:
+        self.store_model_loc = self.config['store_model_loc']
         self.load_model_loc = self.config['load_model_loc']
         self.model_store_format = self.config['model_store_format']
         self.compile_loaded_model = self.config['compile_loaded_model']
@@ -318,6 +320,13 @@ class KerasCNNAE(keras.Model,JDSTModel):
         for key in results.history:
             outputs[key] = results.history[key]
         #+++++++++++++++++++
+
+        # Store the model, if a path is provided:
+        if self.store_model_loc is not None and self.store_model_loc != "":
+            os.makedirs(self.store_model_loc,exist_ok=True)
+            
+            self.save(self.store_model_loc)
+            self.save_config(self.store_model_loc+"/keras_cnn_ae_cfg.yaml")
             
         return outputs
     #****************************

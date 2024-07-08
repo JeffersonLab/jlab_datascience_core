@@ -81,8 +81,17 @@ class ResidualAnalyzer(JDSTAnalysis):
     
     # Compute the residuals:
     #****************************
+    # Make sure that we are operating in 3 dimensions:
+    def image_dimension_check(self,image):
+        if len(image.shape) < 4:
+            return np.expand_dims(image,3)
+        return image
+    
+    #-----------------------
+
+    # Now compute the residuals:
     def compute_residuals(self,x_real,x_rec):
-        residual = x_real - x_rec
+        residual = self.image_dimension_check(x_real) - self.image_dimension_check(x_rec)
 
         if self.reduction_mode.lower() == "mean":
             return np.mean(residual,axis=self.reduction_axis)
