@@ -41,6 +41,20 @@ class ImageToNumpyParser(JDSTDataParser):
             logging.error(">>> " + self.module_name +": The data path(s) must be a list object, e.g. data_loc: [path1,path2,...] <<<")
     #*********************************************
 
+    # Check the input data type --> This module expects a list of strings / file paths:
+    #*********************************************
+    def check_input_data_type(self,input_data):
+        if isinstance(input_data,list) == False:
+            logging.error(f">>> {self.module_name}: The input data type {type(input_data)} is not a list. Please correct. Going to returne None <<<")
+            return False
+        else:
+            if len(input_data) > 0:
+                return True
+            else:
+                logging.error(f">>> {self.module_name}: The list of filepaths your provided {input_data} seems to be empty. Please check your configuration. Going to return None <<<")
+                return False
+    #*********************************************
+
     # Provide information about this module:
     #*********************************************
     def get_info(self):
@@ -92,7 +106,9 @@ class ImageToNumpyParser(JDSTDataParser):
 
     # Now load multiple files:
     def load_data(self):
-        try:
+        
+        if self.check_input_data_type(self.config['image_loc']) == True:
+
             collected_data = []
             #+++++++++++++++++++++
             for path in self.config['image_loc']:
@@ -100,8 +116,8 @@ class ImageToNumpyParser(JDSTDataParser):
             #+++++++++++++++++++++
 
             return np.concatenate(collected_data,axis=self.config['event_axis'])
-        except:
-            logging.exception(">>> " + self.module_name + ": Please check the provided data path which must be a list. <<<")
+        
+        return None
     #*********************************************
 
     # Save the data:

@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 import logging
 import yaml
+import inspect
 import os
 
 class NumpyMinMaxScaler(JDSTDataPrep):
@@ -27,25 +28,19 @@ class NumpyMinMaxScaler(JDSTDataPrep):
             logging.exception(">>> " + self.module_name + f": Invalid feature range: {self.config['feature_range']}. Must provide a tuple. <<<")
     #*********************************************
 
+    # Run type check on the input data:
+    #*********************************************
+    def check_input_data_type(self,data):
+        if isinstance(data,np.ndarray) == False:
+            logging.error(f">>> {self.module_name}: Provided data type {type(data)} is not a numpy array. Please check your workflow. Going to return None <<<")
+            return False
+        else:
+            return True
+
     # Provide information about this module:
     #*********************************************
     def get_info(self):
-        print("  ")
-        print("***   Info: NumpyMinMaxScaler   ***")
-        print("Input(s):")
-        print("i) Full path to .yaml configuration file ") 
-        print("ii) Optional: User configuration, i.e. a python dict with additonal / alternative settings")
-        print("iii) Numpy data")
-        print("What this module does:")
-        print("i) Scale input data with respect to a specified range")
-        print("ii) Optional: reverse the scaling")
-        print("Output(s):")
-        print("i) Scaled .npy data")
-        print("ii) Optional: unscaled .npy data")
-        print("Note(s):")
-        print("i) The scaler will (by default) be fitted to the data and the transform it. To disable the fitting, do: run(data,disable_fit=True)")
-        print("***   Info: NumpyMinMaxScaler   ***")
-        print("  ")
+        print(inspect.getdoc(self))
     #*********************************************
 
     # Handle configurations:
@@ -74,25 +69,14 @@ class NumpyMinMaxScaler(JDSTDataPrep):
         with open(path_to_config, 'w') as file:
            yaml.dump(self.config, file)
     #*********************************************
-    
-    # Run a type chec:
-    #*********************************************
-    def type_check(self,data):
-        if isinstance(data,np.ndarray) == False:
-            logging.error(">>> " + self.module_name + ": Data is not a numpy array <<<")
-            return False
-        
-        return True
-    #*********************************************
-
-    
+     
 
     # Run and reverse the scaling: 
     #*********************************************
     # Scale:
     def run(self,data,disable_fit=False):
         # Check if the data-type is a numpy array:
-        if self.type_check(data):
+        if self.check_input_data_type(data):
 
            # Do not re-calibrate the scaler, if a fit has already been done:
            if disable_fit == True:
@@ -100,13 +84,17 @@ class NumpyMinMaxScaler(JDSTDataPrep):
 
            return self.scaler.fit_transform(data)
         
+        return None
+        
     #-----------------------------
 
     # Undo the scaling:
     def reverse(self,data):
         # Run a type check:
-        if self.type_check(data):
+        if self.check_input_data_type(data):
            return self.scaler.inverse_transform(data)
+        
+        return None
     #*********************************************
 
     # Save the data:

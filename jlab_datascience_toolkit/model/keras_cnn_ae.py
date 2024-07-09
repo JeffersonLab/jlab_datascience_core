@@ -156,6 +156,13 @@ class KerasCNNAE(keras.Model,JDSTModel):
             self.compile()
     #****************************
 
+    # Pass on the data type check for now, as tensorflow allows a variety of data types
+    # see here: https://www.tensorflow.org/api_docs/python/tf/keras/Model#fit
+    #****************************
+    def check_input_data_type(self):
+        pass
+    #****************************
+
     # Run dimensional check on max. pooling and strides       
     #****************************
     def inspect_pooling_and_strides(self,idims,max_pooling,stride_list):

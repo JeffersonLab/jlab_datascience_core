@@ -17,6 +17,13 @@ class JDSTModule(ABC):
     def get_info(self):
         raise NotImplementedError
     
+    # Request that every module runs a type check on the input data
+    # This helps to ensure that we can faster identify if certain modules can not be combined 
+    # e.g. a pytorch module with a tensorflow module, or modules that simply expect different input data types
+    @abstractmethod
+    def check_input_data_type(self):
+        return NotImplementedError
+
     # Load and save configuration files which run the module:
     @abstractmethod
     def load_config(self):

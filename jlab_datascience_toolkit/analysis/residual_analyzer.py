@@ -46,7 +46,22 @@ class ResidualAnalyzer(JDSTAnalysis):
         os.makedirs(self.residual_dir,exist_ok=True)
     #****************************
 
-     # Provide information about this module:
+    # Check input data type:
+    #****************************
+    def check_input_data_type(self,data):
+        if isinstance(data,dict) == True:
+            if bool(dict) == False:
+                logging.error(f">>> {self.module_name}: Your dictionary {data} is empty. Please check. Going to return None. <<<")
+                return False
+            
+            return True
+        
+        else:
+            logging.error(f">>> {self.module_name}: The data type you provided {type(data)} is not a dictionary. Please check. Going to return None. <<<")
+            return False
+    #****************************
+
+    # Provide information about this module:
     #*********************************************
     def get_info(self):
         print(inspect.getdoc(self))
@@ -161,18 +176,21 @@ class ResidualAnalyzer(JDSTAnalysis):
     # Put it all together:
     #****************************
     def run(self,data_dict):
-        x_real = data_dict[self.real_data_name]
-        x_rec = data_dict[self.rec_data_name]
+        if self.check_input_data_type(data_dict):
+           x_real = data_dict[self.real_data_name]
+           x_rec = data_dict[self.rec_data_name]
 
-        # Compute the residuals first:
-        residuals = self.compute_residuals(x_real,x_rec)
+           # Compute the residuals first:
+           residuals = self.compute_residuals(x_real,x_rec)
 
-        # Plot the residuals
-        self.plot_images(x_real,x_rec,residuals,self.residual_dir,"res")
+           # Plot the residuals
+           self.plot_images(x_real,x_rec,residuals,self.residual_dir,"res")
 
-        # Store everything as a movie, if duration is specified:
-        if self.movie_duration > 0.0:
-            self.png_to_movie(self.residual_dir,self.residual_dir,"res_mov")
+           # Store everything as a movie, if duration is specified:
+           if self.movie_duration > 0.0:
+              self.png_to_movie(self.residual_dir,self.residual_dir,"res_mov")
+        else:
+            return None
     #****************************
     
     # Save and load are not active here:

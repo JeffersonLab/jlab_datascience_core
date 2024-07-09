@@ -39,6 +39,31 @@ class NumpyLinearScaler(JDSTDataPrep):
             self.save_config(self.config['store_cfg_loc'])
     #*********************************************
 
+    # Run type check on the input data:
+    #*********************************************
+    def check_input_data_type(self,data):
+        if isinstance(data,np.ndarray) == True:
+            return "numpy"
+            
+        elif isinstance(data,dict) == True:
+                # Make sure that every element in the dictionary is a numpy array:
+                pass_type_check = True
+                #+++++++++++++++++
+                for key in data:
+                   if isinstance(data[key],np.ndarray) == False and key not in self.exclude_data:
+                       pass_type_check = False
+                #+++++++++++++++++
+
+                if pass_type_check:
+                   return "dict"
+                
+                logging.error(">>> " + self.module_name + ": Dictionary does not contain numpy data<<<")
+                return "no_implemented"
+        else:
+            logging.error(f">>> {self.module_name}: Data type {type(data)} is neither a numpy array nor dictionary with numpy data<<<")
+            return "no_implemented"
+    #*********************************************
+
     # Provide information about this module:
     #*********************************************
     def get_info(self):
@@ -72,40 +97,15 @@ class NumpyLinearScaler(JDSTDataPrep):
            yaml.dump(self.config, file)
     #*********************************************
 
-    # Run a type chec:
-    #*********************************************
-    def type_check(self,data):
-        if isinstance(data,np.ndarray) == True:
-            return "numpy"
-            
-        elif isinstance(data,dict) == True:
-                # Make sure that every element in the dictionary is a numpy array:
-                pass_type_check = True
-                #+++++++++++++++++
-                for key in data:
-                   if isinstance(data[key],np.ndarray) == False and key not in self.exclude_data:
-                       pass_type_check = False
-                #+++++++++++++++++
-
-                if pass_type_check:
-                   return "dict"
-                
-                logging.error(">>> " + self.module_name + ": Dictionary does not contain numby data<<<")
-                return "no_implemented"
-        else:
-            logging.error(f">>> {self.module_name}: Data type {type(data)} is neither numpy array nor dictionary with numpy data<<<")
-            return "no_implemented"
-        
-        
-    #*********************************************
+    
     
     # Run and reverse the scaling: 
     #*********************************************
     # Scale:
     def run(self,data):
-        if self.type_check(data).lower() == "numpy":
+        if self.check_input_data_type(data).lower() == "numpy":
            return (data * self.config['A'] + self.config['B']).astype(self.config['run_dtype'])
-        elif self.type_check(data).lower() == "dict":
+        elif self.check_input_data_type(data).lower() == "dict":
             result_dict = {}
             #+++++++++++++++++++
             for key in data:
@@ -114,14 +114,16 @@ class NumpyLinearScaler(JDSTDataPrep):
             #+++++++++++++++++++
 
             return result_dict
+        
+        return None
     #-----------------------------
 
     # Undo scaling:
     def reverse(self,data):
-        if self.type_check(data).lower() == "numpy":
+        if self.check_input_data_type(data).lower() == "numpy":
             reversed_data = (data - self.config['B']) / self.config['A']
             return reversed_data.astype(self.config['reverse_dtype'])
-        elif self.type_check(data).lower() == "dict":
+        elif self.check_input_data_type(data).lower() == "dict":
             result_dict = {}
             #+++++++++++++++++++
             for key in data:
@@ -131,6 +133,8 @@ class NumpyLinearScaler(JDSTDataPrep):
             #+++++++++++++++++++
 
             return result_dict
+        
+        return None
     #*********************************************
 
      # Save the data:

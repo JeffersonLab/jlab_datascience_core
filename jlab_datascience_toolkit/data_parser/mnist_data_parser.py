@@ -34,6 +34,12 @@ class MNISTDataParser(JDSTDataParser):
         self.mnist_labels = None
     #*********************************************
 
+    # Check input data which is not necessary here, as this module does not require any:
+    #*********************************************
+    def check_input_data_type(self):
+        pass
+    #*********************************************
+
     # Provide information about this module:
     #*********************************************
     def get_info(self):

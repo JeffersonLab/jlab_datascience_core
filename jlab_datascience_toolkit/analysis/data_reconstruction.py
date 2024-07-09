@@ -23,8 +23,8 @@ class DataReconstruction(JDSTAnalysis):
     i) Dictionary with reconstructed images and (optional) original images
     '''
 
-     # Initialize:
-    #****************************
+    # Initialize:
+    #*********************************************
     def __init__(self,path_to_cfg,user_config={}):
         # Define the module and module name:
         self.module_name = "data_reconstruction"
@@ -53,9 +53,29 @@ class DataReconstruction(JDSTAnalysis):
         if self.output_loc is not None and self.output_loc.lower() != "":
            self.store_data = True
            os.makedirs(self.output_loc,exist_ok=True)
-    #****************************
+    #*********************************************
 
-     # Provide information about this module:
+    # Check the input data type:
+    #*********************************************
+    def check_input_data_type(self,x=None,model_list=[]):
+       
+        if isinstance(x,np.ndarray) and isinstance(model_list,list):
+                pass_model_type_check = False
+                if len(model_list) > 0:
+                    pass_model_type_check = True
+                    #+++++++++++++++
+                    for m in model_list:
+                       if isinstance(m,tf.keras.Model) == False:
+                           pass_model_type_check = False
+                    #+++++++++++++++
+
+                return pass_model_type_check
+        else:
+            logging.error(f">>> {self.module_name}: The provided data does not match the requirements. The first argument has to be a numpy array, Whereas the second argument should be a non-empty list with tf.keras.Model. Going to return None. <<<")
+            return False
+    #*********************************************
+
+    # Provide information about this module:
     #*********************************************
     def get_info(self):
         print(inspect.getdoc(self))
@@ -150,12 +170,17 @@ class DataReconstruction(JDSTAnalysis):
     # Run the analysis:
     #*********************************************
     def run(self,x,model_list):
-        results = self.reconstruct_data(x,model_list)
+        # Run type check:
+        if self.check_input_data_type(x,model_list):
+           results = self.reconstruct_data(x,model_list)
 
-        if self.store_data:
-            np.save(self.output_loc+"/"+self.data_store_name+".npy",np.array(results,dtype=object))
+           if self.store_data:
+              np.save(self.output_loc+"/"+self.data_store_name+".npy",np.array(results,dtype=object))
 
-        return results
+           return results
+        
+        else:
+            return None
     #*********************************************
 
     # Save and load are not active here:

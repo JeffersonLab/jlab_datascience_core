@@ -53,6 +53,20 @@ class LearningCurveVisualizer(JDSTAnalysis):
         os.makedirs(self.plot_loc,exist_ok=True)
     #*********************************************
 
+    # Check the data type:
+    #*********************************************
+    def check_input_data_type(self,data):
+        if isinstance(data,dict) == True:
+            if bool(dict) == False:
+                logging.error(f">>> {self.module_name}: Your dictionary {data} is empty. Please check. Going to return None. <<<")
+                return False
+            return True
+        
+        else:
+            logging.error(f">>> {self.module_name}: The data type you provided {type(data)} is not a dictionary. Please check. Going to return None. <<<")
+            return False
+    #*********************************************
+
     # Provide information about this module:
     #*********************************************
     def get_info(self):
@@ -111,9 +125,10 @@ class LearningCurveVisualizer(JDSTAnalysis):
 
 
     def run(self,training_history):
-        # Loop through all plots that we wish to produce:
-        #+++++++++++++++++++++++
-        for plot in self.plots:
+        if self.check_input_data_type(training_history):
+          # Loop through all plots that we wish to produce:
+          #+++++++++++++++++++++++
+          for plot in self.plots:
             # Create a canvas to draw on:
             fig,ax = plt.subplots(figsize=self.fig_size)
             
@@ -141,7 +156,10 @@ class LearningCurveVisualizer(JDSTAnalysis):
             if name is not None:
                  fig.savefig(self.plot_loc+"/"+name+".png")
                  plt.close(fig)
-        #+++++++++++++++++++++++
+          #+++++++++++++++++++++++
+
+        else:
+            return None
     #*********************************************
 
     # Save and load are not active here:

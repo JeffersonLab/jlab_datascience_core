@@ -63,6 +63,8 @@ class PandasParser(JDSTDataParser):
         # It is important not to use default mutable arguments in python
         #   (lists/dictionaries), so we set config to None and update later
 
+        self.module_name = "pandas_parser"
+
         # Set default config
         self.config = dict(
             filepaths=[], 
@@ -94,6 +96,17 @@ class PandasParser(JDSTDataParser):
                     f'File format {self.config["file_format"]}'
                      'is not currently supported.')
             raise ValueError
+        
+    def check_input_data_type(self,input_data):
+        if isinstance(input_data,list) == False:
+            logging.error(f">>> {self.name}: The input data type {type(input_data)} is not a list. Please correct. Going to returne None <<<")
+            return False
+        else:
+            if len(input_data) > 0:
+                return True
+            else:
+                logging.error(f">>> {self.name}: The list of filepaths your provided {input_data} seems to be empty. Please check your configuration. Going to return None <<<")
+                return False
 
     def get_info(self):
         """ Prints the docstring for the PandasParser module"""
@@ -131,27 +144,23 @@ class PandasParser(JDSTDataParser):
         Returns:
             pd.DataFrame: A single DataFrame containing concatenated data
         """
-        data_list = []
-        for file in self.config['filepaths']:
-            pandas_parser_log.debug(f'Loading {file} ...')
-            data = self.read_function(
-                file, 
-                **self.config['read_kwargs'])
-            data_list.append(data)
 
-        # Check for empty data and return nothing if empty
-        if not data_list:
-            pandas_parser_log.warning(
-                'load_data() returning None. This is probably not what you '
-                'wanted. Ensure that your configuration includes the key '
-                '"filepaths"')
-            return 
-        
-        output = pd.concat(
+        if self.check_input_data_type(self.config['filepaths']) == True:
+
+            data_list = []
+            for file in self.config['filepaths']:
+               pandas_parser_log.debug(f'Loading {file} ...')
+               data = self.read_function(
+                   file, 
+                   **self.config['read_kwargs'])
+               data_list.append(data)
+
+            return pd.concat(
             data_list, 
             **self.config['concat_kwargs'])
         
-        return output
+        
+        return None
 
     def load_config(self, path: str):
         pandas_parser_log.debug('Calling load()...')
