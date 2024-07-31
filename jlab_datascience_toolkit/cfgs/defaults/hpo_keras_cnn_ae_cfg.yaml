@@ -1,1 +1,51 @@
-precision: "float32"
+# Which model to use / load:
+model_id: "KerasCNNAE_v0"
+model_cfg_loc: ""
+# Model specific settings:
+max_pooling: null
+kernel_size: 3
+stride: 2
+optimizer: "adam"
+conv_kernel_initialization: 'normal'
+conv_bias_initialization: 'zeros'
+dense_kernel_initialization: 'normal'
+dense_bias_initialization: 'zeros'
+# HPO specific settings:
+n_hpo_trials: 2
+n_epochs_per_trial: 3
+batch_size_per_trial: 128
+validation_split_per_trial: 0.1
+verbosity_per_trial: 0
+hpo_objective_fn: "val_loss"
+hpo_objective_direction: "minimize"
+hpo_result_folder: "results_hpo_keras_cnn_ae_v0"
+hpo_study_name: "study_keras_cnn_ae"
+hpo_param_importance: ['latent_dim','n_dense_layers','n_conv_layers','learning_rate','conv_activation','dense_activation']
+# Training of 'final' model:
+n_epochs: 5
+batch_size: 128
+validation_split: 0.1
+verbosity: 'auto'
+# Tuneabale parameters:
+# Conv. architecture:
+max_n_conv_layers: 2
+step_n_conv_layers: 1
+max_conv_filters: 50
+min_conv_filters: 20
+step_conv_filters: 10
+# Dense architecture:
+max_n_dense_layers: 3
+step_n_dense_layers: 1
+max_dense_units: 30
+min_dense_units: 10
+step_dense_units: 5
+# Latent dim:
+max_latent_dim: 50
+min_latent_dim: 10
+step_latent_dim: 5
+# Learning rate:
+max_learning_rate: 0.001
+min_learning_rate: 0.000001
+# Activation functions:
+conv_activation: ['relu','leaky_relu','tanh']
+dense_activation: ['relu','leaky_relu','tanh']

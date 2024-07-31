@@ -41,7 +41,7 @@ user_cfgs = {
     'anomaly_detector':{
         'store_model_loc':result_loc,
         'image_dimensions':(28,28,1),
-        'n_epochs': 25,
+        'n_epochs': 50,
         'dense_architecture':[10,10],
         'dense_activations':['relu']*2,
         'dense_kernel_inits':['he_normal']*2,
