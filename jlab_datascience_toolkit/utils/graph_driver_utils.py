@@ -1,9 +1,9 @@
 from typing import NamedTuple, Union, Iterable
 from jlab_datascience_toolkit.utils.registration import make 
-import jlab_datascience_toolkit.data_parser
-import jlab_datascience_toolkit.data_prep
-import jlab_datascience_toolkit.model
-import jlab_datascience_toolkit.analysis
+import jlab_datascience_toolkit.data_parsers
+import jlab_datascience_toolkit.data_preps
+import jlab_datascience_toolkit.models
+import jlab_datascience_toolkit.analyses
 
 '''
 This class was developed by Steven Goldenberg (sgolden@jlab.org) and helps set up a generic driver in an elegant way.

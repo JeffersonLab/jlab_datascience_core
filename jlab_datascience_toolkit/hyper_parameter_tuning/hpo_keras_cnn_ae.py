@@ -1,5 +1,5 @@
 from jlab_datascience_toolkit.core.jdst_model import JDSTModel
-import jlab_datascience_toolkit.model as models
+import jlab_datascience_toolkit.models as models
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt

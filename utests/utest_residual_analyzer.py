@@ -1,4 +1,4 @@
-import jlab_datascience_toolkit.analysis as analyses
+import jlab_datascience_toolkit.analyses as analyses
 from jlab_datascience_toolkit.utils.get_mnist import get_mnist_data
 import numpy as np
 import unittest

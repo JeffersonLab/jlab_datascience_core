@@ -1,4 +1,4 @@
-from jlab_datascience_toolkit.data_parser import make
+from jlab_datascience_toolkit.data_parsers import make
 import unittest
 import matplotlib.pyplot as plt
 import pandas as pd

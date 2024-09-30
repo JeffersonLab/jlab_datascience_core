@@ -1,4 +1,4 @@
-import jlab_datascience_toolkit.model as models
+import jlab_datascience_toolkit.models as models
 from jlab_datascience_toolkit.utils.get_mnist import get_mnist_data
 import unittest
 import numpy as np

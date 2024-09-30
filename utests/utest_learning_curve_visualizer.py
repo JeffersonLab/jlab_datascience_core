@@ -1,4 +1,4 @@
-import jlab_datascience_toolkit.analysis as analyses
+import jlab_datascience_toolkit.analyses as analyses
 import numpy as np
 import unittest
 import matplotlib.pyplot as plt
