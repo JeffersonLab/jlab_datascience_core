@@ -7,3 +7,7 @@ register(
 
 from jlab_datascience_toolkit.data_prep.numpy_minmax_scaler import NumpyMinMaxScaler
 
+register(
+    id = "PandasStandardScaler_v0",
+    entry_point="jlab_datascience_toolkit.data_prep.pandas_standard_scaler:PandasStandardScaler"
+)
