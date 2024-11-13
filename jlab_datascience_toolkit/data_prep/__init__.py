@@ -11,3 +11,8 @@ register(
     id = "PandasStandardScaler_v0",
     entry_point="jlab_datascience_toolkit.data_prep.pandas_standard_scaler:PandasStandardScaler"
 )
+
+register(
+    id = "SplitDataFrame_v0",
+    entry_point="jlab_datascience_toolkit.data_prep.split_dataframe_v0:SplitDataFrame"
+)

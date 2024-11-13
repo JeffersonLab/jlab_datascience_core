@@ -1,0 +1,44 @@
+{
+  "model_configs": {
+    "registered_name": "KerasMLP_v0",
+    "input_dim": 4,
+    "layers_dicts": [
+      {"layer_type": "Dense", "layer_configs": {"units": 10, "activation": "relu"}},
+      {"layer_type": "BatchNormalization"},
+      {"layer_type": "Dropout", "layer_configs": {"rate": 0.05}},
+      {"layer_type": "Dense", "layer_configs": {"units": 20, "activation": "relu"}},
+      {"layer_type": "BatchNormalization"},
+      {"layer_type": "Dropout", "layer_configs": {"rate": 0.05}},
+      {"layer_type": "Dense", "layer_configs": {"units": 10, "activation": "relu"}},
+      {"layer_type": "BatchNormalization"},
+      {"layer_type": "Dropout", "layer_configs": {"rate": 0.05}},
+      {"layer_type": "Dense", "layer_configs": {"units": 5, "activation": "relu"}},
+      {"layer_type": "BatchNormalization"},
+      {"layer_type": "Dense", "layer_configs": {"units": 3, "activation": "softmax"}},
+    ]
+  },
+  "trainer_configs": {
+    "registered_name": "KerasTrainer_v0",
+    "loss_configs": {
+        "loss_type": "SparseCategoricalCrossentropy"
+    },
+    "optimizer_configs": {
+        "optimizer_type": "Adam", "learning_rate": 0.01
+    },
+    "epochs": 400,
+    "callbacks": [
+        {"callback_type": "EarlyStopping", "monitor": "val_loss", "patience": 50},
+        {"callback_type": "ReduceLROnPlateau", "monitor": "val_loss", "patience": 10},
+    ],
+  },
+  "analysis_configs": {
+    "registered_name": "MultiClassClassificationAnalysis_v0",
+    "submodules": [
+      {"type": "confusion_matrix"},
+      {"type": "accuracy_score", "configs": {"normalize": true}},
+      {"type": "precision_score", "configs": {"average": "macro"}},
+      {"type": "recall_score", "configs": {"average": "macro"}},
+      {"type": "f1_score", "configs": {"average": "macro"}}
+    ]
+  }
+}
