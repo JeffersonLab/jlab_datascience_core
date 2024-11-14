@@ -1,44 +1,80 @@
-{
-  "model_configs": {
-    "registered_name": "KerasMLP_v0",
-    "input_dim": 4,
-    "layers_dicts": [
-      {"layer_type": "Dense", "layer_configs": {"units": 10, "activation": "relu"}},
-      {"layer_type": "BatchNormalization"},
-      {"layer_type": "Dropout", "layer_configs": {"rate": 0.05}},
-      {"layer_type": "Dense", "layer_configs": {"units": 20, "activation": "relu"}},
-      {"layer_type": "BatchNormalization"},
-      {"layer_type": "Dropout", "layer_configs": {"rate": 0.05}},
-      {"layer_type": "Dense", "layer_configs": {"units": 10, "activation": "relu"}},
-      {"layer_type": "BatchNormalization"},
-      {"layer_type": "Dropout", "layer_configs": {"rate": 0.05}},
-      {"layer_type": "Dense", "layer_configs": {"units": 5, "activation": "relu"}},
-      {"layer_type": "BatchNormalization"},
-      {"layer_type": "Dense", "layer_configs": {"units": 3, "activation": "softmax"}},
-    ]
-  },
-  "trainer_configs": {
-    "registered_name": "KerasTrainer_v0",
-    "loss_configs": {
-        "loss_type": "SparseCategoricalCrossentropy"
-    },
-    "optimizer_configs": {
-        "optimizer_type": "Adam", "learning_rate": 0.01
-    },
-    "epochs": 400,
-    "callbacks": [
-        {"callback_type": "EarlyStopping", "monitor": "val_loss", "patience": 50},
-        {"callback_type": "ReduceLROnPlateau", "monitor": "val_loss", "patience": 10},
-    ],
-  },
-  "analysis_configs": {
-    "registered_name": "MultiClassClassificationAnalysis_v0",
-    "submodules": [
-      {"type": "confusion_matrix"},
-      {"type": "accuracy_score", "configs": {"normalize": true}},
-      {"type": "precision_score", "configs": {"average": "macro"}},
-      {"type": "recall_score", "configs": {"average": "macro"}},
-      {"type": "f1_score", "configs": {"average": "macro"}}
-    ]
-  }
-}
+analysis_configs:
+  registered_name: MultiClassClassificationAnalysis_v0
+  submodules:
+  - type: confusion_matrix
+  - configs:
+      normalize: true
+    type: accuracy_score
+  - configs:
+      average: macro
+    type: precision_score
+  - configs:
+      average: macro
+    type: recall_score
+  - configs:
+      average: macro
+    type: f1_score
+model_configs:
+  input_dim: 4
+  layers_dicts:
+  - layer_configs:
+      activation: relu
+      units: 10
+    layer_type: Dense
+  - layer_type: BatchNormalization
+  - layer_configs:
+      rate: 0.05
+    layer_type: Dropout
+  - layer_configs:
+      activation: relu
+      units: 20
+    layer_type: Dense
+  - layer_type: BatchNormalization
+  - layer_configs:
+      rate: 0.05
+    layer_type: Dropout
+  - layer_configs:
+      activation: relu
+      units: 10
+    layer_type: Dense
+  - layer_type: BatchNormalization
+  - layer_configs:
+      rate: 0.05
+    layer_type: Dropout
+  - layer_configs:
+      activation: relu
+      units: 5
+    layer_type: Dense
+  - layer_type: BatchNormalization
+  - layer_configs:
+      activation: softmax
+      units: 3
+    layer_type: Dense
+  registered_name: KerasMLP_v0
+prep_configs:
+  feature_columns:
+  - sepal_length
+  - sepal_width
+  - petal_length
+  - petal_width
+  registered_name: SplitDataFrame_v0
+  rows_fractions:
+  - 0.7
+  - 0.15
+  - 0.15
+  target_columns: species_int
+trainer_configs:
+  callbacks:
+  - callback_type: EarlyStopping
+    monitor: val_loss
+    patience: 50
+  - callback_type: ReduceLROnPlateau
+    monitor: val_loss
+    patience: 10
+  epochs: 400
+  loss_configs:
+    loss_type: SparseCategoricalCrossentropy
+  optimizer_configs:
+    learning_rate: 0.01
+    optimizer_type: Adam
+  registered_name: KerasTrainer_v0

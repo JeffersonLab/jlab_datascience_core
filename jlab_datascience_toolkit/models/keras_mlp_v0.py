@@ -1,10 +1,14 @@
 import os
 import yaml
 import keras
+import inspect
 from jlab_datascience_toolkit.core.jdst_model import JDSTModel
 
 
 class KerasMLP(JDSTModel):
+    '''
+    Defines an MLP model. self is not a keras.Model itself. Instead, it has a "model" attribute which is a keras.Model.
+    '''
     def __init__(self, configs: dict):
         '''
         configs has the following keywords:
@@ -14,7 +18,7 @@ class KerasMLP(JDSTModel):
             2.2) 'layer_type': 'Dropout', 'layer_configs': keras Dropout layer configs
             2.3) 'layer_type': 'BatchNormalization', 'layer_configs': keras BN layer cnfigs
         '''
-        self.configs = configs.copy()
+        self.configs = configs
         inputs = keras.layers.Input(shape=(configs['input_dim'],))
         outputs = inputs
         for layer_dict in configs['layers_dicts']:
@@ -29,17 +33,14 @@ class KerasMLP(JDSTModel):
             else:
                 raise NameError('Unrecognized layer_type !!!')
         self.model = keras.models.Model(inputs=inputs, outputs=outputs)
-    
-    def fit(self, **kwargs):
-        history = self.model.fit(**kwargs)
-        return history
 
     def predict(self, x):
         y = self.model.predict(x)
         return y
     
     def get_info(self):
-        pass
+        """Prints this module's docstring."""
+        print(inspect.getdoc(self))
     
     def load(self, folder_path: str):
         assert os.path.exists(folder_path)
