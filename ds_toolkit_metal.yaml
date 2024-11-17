@@ -20,6 +20,7 @@ dependencies:
     - scipy
     - tqdm
     - pandas
+    - seaborn
     - unittest2
     - jupyter
     - imageio

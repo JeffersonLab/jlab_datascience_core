@@ -5,15 +5,9 @@ analysis_configs:
   - configs:
       normalize: true
     type: accuracy_score
-  - configs:
-      average: macro
-    type: precision_score
-  - configs:
-      average: macro
-    type: recall_score
-  - configs:
-      average: macro
-    type: f1_score
+  - type: classification_report
+    configs:
+      output_dict: true
 model_configs:
   input_dim: 4
   layers_dicts:

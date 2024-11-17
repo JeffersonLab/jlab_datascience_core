@@ -10,11 +10,12 @@ from jlab_datascience_toolkit.analysis import make as make_analysis
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--cfg_file_path", type=str, default="/home/ahmedm/projects/jlab_datascience_core/jlab_datascience_toolkit/cfgs/defaults/example_cfg.yaml")
+    parser.add_argument("--cfg_file", type=str, default="../cfgs/defaults/multiclass_cfg.yaml", help='Path to yaml configuration file')
+    parser.add_argument("--logdir", type=str, default="./", help='Path logging directory. If None, analysis figures will not be saved.')
     args = parser.parse_args()
     args = vars(args)     # convert args from argparse.Namespace to dict
 
-    with open(args['cfg_file_path'], 'r') as file:
+    with open(args['cfg_file'], 'r') as file:
         configs = yaml.safe_load(file)
         prep_configs = configs['prep_configs']
         model_configs = configs['model_configs']
@@ -47,5 +48,11 @@ if __name__ == '__main__':
     y_pred = model.predict(x_test)    # (n_samples, c_classes)
     y_pred = y_pred.argmax(axis=1)    # (n_samples)
     multiclass_ana = make_analysis(analysis_configs["registered_name"], configs=analysis_configs)
-    results = multiclass_ana.run(y_test, y_pred, labels=list(range(len(classes_list))))
+    results = multiclass_ana.run(
+        y_test,
+        y_pred,
+        labels = [tup[1] for tup in classes_list],
+        target_names = [tup[0] for tup in classes_list],
+        logdir = args['logdir']
+    )
     print(results)
