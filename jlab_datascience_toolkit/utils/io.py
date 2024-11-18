@@ -3,10 +3,11 @@ from pathlib import Path
 import tempfile
 import logging
 import sys
+from typing import Union
 
 io_log = logging.getLogger('io_log')
 
-def save_yaml_config(config: dict, path: str | Path, overwrite: bool = False):
+def save_yaml_config(config: dict, path: Union[str, Path], overwrite: bool = False):
     """ Saves configuration dictionary to a yaml file
 
     Args:
@@ -37,7 +38,7 @@ def save_yaml_config(config: dict, path: str | Path, overwrite: bool = False):
         io_log.info(f'Writing config to {path}')
         yaml.safe_dump(config, f)
 
-def load_yaml_config(path: str | Path):
+def load_yaml_config(path: Union[str, Path]):
     path = Path(path)
     if path.is_dir():
         path = path.joinpath('config.yaml')

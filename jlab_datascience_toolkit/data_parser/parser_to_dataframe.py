@@ -6,6 +6,7 @@ import logging
 import yaml
 import inspect
 import os
+from typing import Union
 
 parser_log = logging.getLogger('Parser Logger')
 
@@ -162,11 +163,11 @@ class Parser2DataFrame(JDSTDataParser):
         
         return output
 
-    def load_config(self, path: Path | str):
+    def load_config(self, path: Union[Path, str]):
         self.config.update(load_yaml_config(path))
         self.setup()
 
-    def save_config(self, path: Path | str, overwrite=False):
+    def save_config(self, path: Union[Path, str], overwrite=False):
         """ Saves this modules configuration to the file specified by path
             If path is a directory, we save the configuration as config.yaml
 
