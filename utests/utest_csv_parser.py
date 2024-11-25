@@ -9,10 +9,10 @@ import shutil
 import sys
 import os
 
-test_log = logging.Logger('test_logger')
+test_log = logging.Logger("test_logger")
 
 rng = np.random.default_rng(seed=42)
-parser_id = 'CSVParser_v0'
+parser_id = "CSVParser_v0"
 
 
 class TestCSVParserv0(unittest.TestCase):
@@ -24,42 +24,44 @@ class TestCSVParserv0(unittest.TestCase):
 
     @classmethod
     def setUpClass(self) -> None:
-        print('Setting up all tests...')
-        self.columns = ['R121GMES', 'R122GMES',
-                        'R123GMES', 'R121GSET', 'R122GSET', 'R123GSET']
-        self.path = './csv_parser_utest.csv'
+        print("Setting up all tests...")
+        self.columns = [
+            "R121GMES",
+            "R122GMES",
+            "R123GMES",
+            "R121GSET",
+            "R122GSET",
+            "R123GSET",
+        ]
+        self.path = "./csv_parser_utest.csv"
         self.samples = 100
-        data = rng.normal(loc=5, scale=1, size=(
-            self.samples, len(self.columns)))
+        data = rng.normal(loc=5, scale=1, size=(self.samples, len(self.columns)))
         dates = []
-        for i in range(1, self.samples+1):
-            dates.append(np.datetime64(
-                f'2010-03-24 10:{i//60:02d}:{i % 60:02d}'))
+        for i in range(1, self.samples + 1):
+            dates.append(np.datetime64(f"2010-03-24 10:{i//60:02d}:{i % 60:02d}"))
 
         test_data = pd.DataFrame(data, columns=self.columns, index=dates)
-        test_data.index.name = 'Date'
+        test_data.index.name = "Date"
         test_data
         test_data.to_csv(self.path)
 
-        self.path2 = './csv_parser_utest2.csv'
-        data = rng.normal(loc=9, scale=2, size=(
-            self.samples, len(self.columns)))
+        self.path2 = "./csv_parser_utest2.csv"
+        data = rng.normal(loc=9, scale=2, size=(self.samples, len(self.columns)))
         dates = []
-        for i in range(1, self.samples+1):
-            dates.append(np.datetime64(
-                f'2010-03-25 09:{i//60:02d}:{i % 60:02d}'))
+        for i in range(1, self.samples + 1):
+            dates.append(np.datetime64(f"2010-03-25 09:{i//60:02d}:{i % 60:02d}"))
 
         test_data = pd.DataFrame(data, columns=self.columns, index=dates)
-        test_data.index.name = 'Date'
+        test_data.index.name = "Date"
         test_data
         test_data.to_csv(self.path2)
 
     @classmethod
     def tearDownClass(self) -> None:
-        print('Removing temporary files...')
+        print("Removing temporary files...")
         os.remove(self.path)
         os.remove(self.path2)
-        print('Have a good day!')
+        print("Have a good day!")
 
     def setUp(self) -> None:
         print()
@@ -70,70 +72,75 @@ class TestCSVParserv0(unittest.TestCase):
         return super().tearDown()
 
     def test_no_config(self):
-        print('*****No Config Test*****\n')
+        print("*****No Config Test*****\n")
         parser = make(parser_id)
         output = parser.load_data()
         self.assertIsNone(output)
 
     def test_string_filepaths(self):
-        print('*****String Filepaths Test*****\n')
+        print("*****String Filepaths Test*****\n")
 
         parser = make(parser_id, config=dict(filepaths=self.path))
         output = parser.load_data()
-        print('Output Head:\n', output.head())
+        print("Output Head:\n", output.head())
 
-        self.assertEqual(output.shape, (self.samples, len(self.columns)+1))
+        self.assertEqual(output.shape, (self.samples, len(self.columns) + 1))
 
     def test_one_item_list_filepaths(self):
-        print('*****One Item List Test*****\n')
+        print("*****One Item List Test*****\n")
 
         parser = make(parser_id, config=dict(filepaths=[self.path]))
         output = parser.load_data()
-        print('Output Head:\n', output.head())
-        self.assertEqual(output.shape, (self.samples, len(self.columns)+1))
+        print("Output Head:\n", output.head())
+        self.assertEqual(output.shape, (self.samples, len(self.columns) + 1))
 
     def test_two_filepaths(self):
-        print('*****Two Filepaths Test*****\n')
+        print("*****Two Filepaths Test*****\n")
         parser = make(parser_id, config=dict(filepaths=[self.path, self.path2]))
         output = parser.load_data()
-        print('Output Head:\n', output.head())
-        print('Output shape:', output.shape)
-        self.assertEqual(output.shape, (2*self.samples, len(self.columns)+1))
+        print("Output Head:\n", output.head())
+        print("Output shape:", output.shape)
+        self.assertEqual(output.shape, (2 * self.samples, len(self.columns) + 1))
 
     def test_usecols_read_arg(self):
-        print('*****Usecols Read Arg Test*****\n')
+        print("*****Usecols Read Arg Test*****\n")
 
-        two_columns = ['R121GMES', 'R121GSET']
-        parser = make(parser_id, config=dict(
-            filepaths=self.path, read_kwargs=dict(usecols=two_columns)))
+        two_columns = ["R121GMES", "R121GSET"]
+        parser = make(
+            parser_id,
+            config=dict(filepaths=self.path, read_kwargs=dict(usecols=two_columns)),
+        )
         output = parser.load_data()
-        print('Output Head:\n', output.head())
+        print("Output Head:\n", output.head())
         self.assertEqual(output.shape, (self.samples, 2))
         self.assertEqual(set(output.columns), set(two_columns))
 
     def test_use_datetime_index(self):
-        print('*****Use Datetime Index Test*****\n')
+        print("*****Use Datetime Index Test*****\n")
 
-        def column_lambda(x): return ('GMES' in x) or (x == 'Date')
-        read_kwargs = dict(usecols=column_lambda,
-                           index_col='Date', parse_dates=True)
-        parser = make(parser_id,
-                      config=dict(
-                          filepaths=self.path, read_kwargs=read_kwargs)
-                      )
+        def column_lambda(x):
+            return ("GMES" in x) or (x == "Date")
+
+        read_kwargs = dict(usecols=column_lambda, index_col="Date", parse_dates=True)
+        parser = make(
+            parser_id, config=dict(filepaths=self.path, read_kwargs=read_kwargs)
+        )
         output = parser.load_data()
-        print('Output Head:\n', output.head())
+        print("Output Head:\n", output.head())
         self.assertEqual(output.shape, (self.samples, 3))
         for column in output.columns:
-            self.assertTrue('GMES' in column)
+            self.assertTrue("GMES" in column)
         self.assertIsInstance(output.index, pd.DatetimeIndex)
 
     def test_save_load(self):
-        print('*****Save/Load Test*****\n')
+        print("*****Save/Load Test*****\n")
 
-        parser = make(parser_id, config=dict(filepaths=self.path, read_kwargs={'usecols': self.columns}))
+        parser = make(
+            parser_id,
+            config=dict(filepaths=self.path, read_kwargs={"usecols": self.columns}),
+        )
         output = parser.load_data()
-        save_path = './temp_parser'
+        save_path = "./temp_parser"
         try:
             parser.save(save_path)
             new_parser = make(parser_id)
@@ -146,9 +153,10 @@ class TestCSVParserv0(unittest.TestCase):
             shutil.rmtree(save_path)
         pass
 
+
 # Run this file via: python utest_csv_parser_v0.py
 if __name__ == "__main__":
     argv = len(sys.argv) > 1 and sys.argv[1]
-    loglevel = logging.DEBUG if argv == '-v' else logging.WARNING
+    loglevel = logging.DEBUG if argv == "-v" else logging.WARNING
     logging.basicConfig(stream=sys.stdout, level=loglevel)
     unittest.main()

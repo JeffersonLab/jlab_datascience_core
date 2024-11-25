@@ -6,7 +6,7 @@ module_log = logging.getLogger("Module Registry")
 
 def load(name):
     mod_name, attr_name = name.split(":")
-    print(f'Attempting to load {mod_name} with {attr_name}')
+    print(f"Attempting to load {mod_name} with {attr_name}")
     mod = importlib.import_module(mod_name)
     fn = getattr(mod, attr_name)
     return fn
@@ -21,11 +21,15 @@ class ModuleSpec(object):
     def make(self, **kwargs):
         """Instantiates an instance of data module with appropriate kwargs"""
         if self.entry_point is None:
-            module_log.error('Attempting to make deprecated module {}. \
+            module_log.error(
+                "Attempting to make deprecated module {}. \
                                (HINT: is there a newer registered version \
-                               of this module?)'.format(self.id))
+                               of this module?)".format(
+                    self.id
+                )
+            )
             raise RuntimeError
-        
+
         _kwargs = self._kwargs.copy()
         _kwargs.update(kwargs)
         if callable(self.entry_point):
@@ -43,9 +47,9 @@ class ModuleRegistry(object):
 
     def make(self, path, **kwargs):
         if len(kwargs) > 0:
-            module_log.info('Making new module: %s (%s)', path, kwargs)
+            module_log.info("Making new module: %s (%s)", path, kwargs)
         else:
-            module_log.info('Making new module: %s', path)
+            module_log.info("Making new module: %s", path)
         module_spec = self.spec(path)
         module = module_spec.make(**kwargs)
 
@@ -55,14 +59,18 @@ class ModuleRegistry(object):
         return self.module_specs.values()
 
     def spec(self, path):
-        if ':' in path:
-            mod_name, _sep, id = path.partition(':')
+        if ":" in path:
+            mod_name, _sep, id = path.partition(":")
             try:
                 importlib.import_module(mod_name)
             except ImportError:
-                module_log.error('A module ({}) was specified for the module but was not found, \
+                module_log.error(
+                    "A module ({}) was specified for the module but was not found, \
                                    make sure the package is installed with `pip install` before \
-                                   calling `module.make()`'.format(mod_name))
+                                   calling `module.make()`".format(
+                        mod_name
+                    )
+                )
                 raise
 
         else:
@@ -71,12 +79,12 @@ class ModuleRegistry(object):
         try:
             return self.module_specs[id]
         except KeyError:
-            module_log.error('No registered module with id: {}'.format(id))
-            raise 
+            module_log.error("No registered module with id: {}".format(id))
+            raise
 
     def register(self, id, **kwargs):
         if id in self.module_specs:
-            module_log.error('Cannot re-register id: {}'.format(id))
+            module_log.error("Cannot re-register id: {}".format(id))
             raise RuntimeError
         self.module_specs[id] = ModuleSpec(id, **kwargs)
 
@@ -95,6 +103,7 @@ def make(id, **kwargs):
 
 def spec(id):
     return module_registry.spec(id)
+
 
 def list_registered_modules():
     return list(module_registry.module_specs.keys())
