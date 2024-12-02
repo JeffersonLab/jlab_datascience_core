@@ -1,36 +1,24 @@
 import yaml
 import argparse
 import seaborn as sns
+import hydra
 from sklearn.preprocessing import StandardScaler
 from jlab_datascience_toolkit.data_prep import make as make_prep
 from jlab_datascience_toolkit.models import make as make_model
 from jlab_datascience_toolkit.trainers import make as make_trainer
 from jlab_datascience_toolkit.analysis import make as make_analysis
+from omegaconf import OmegaConf
 
+@hydra.main(version_base=None, config_path="../cfgs/defaults", config_name="multiclass_cfg")
+def main(cfg):
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--cfg_file",
-        type=str,
-        default="../cfgs/defaults/multiclass_cfg.yaml",
-        help="Path to yaml configuration file",
-    )
-    parser.add_argument(
-        "--logdir",
-        type=str,
-        default="./",
-        help="Path logging directory. If None, analysis figures will not be saved.",
-    )
-    args = parser.parse_args()
-    args = vars(args)  # convert args from argparse.Namespace to dict
+    args = {"logdir": cfg["logdir"]}
 
-    with open(args["cfg_file"], "r") as file:
-        configs = yaml.safe_load(file)
-        prep_configs = configs["prep_configs"]
-        model_configs = configs["model_configs"]
-        trainer_configs = configs["trainer_configs"]
-        analysis_configs = configs["analysis_configs"]
+    configs = OmegaConf.to_container(cfg)
+    prep_configs = configs["prep_configs"]
+    model_configs = configs["model_configs"]
+    trainer_configs = configs["trainer_configs"]
+    analysis_configs = configs["analysis_configs"]
 
     # 1) Load Data
     df = sns.load_dataset("iris")
@@ -70,3 +58,7 @@ if __name__ == "__main__":
         logdir=args["logdir"],
     )
     print(results)
+
+
+if __name__ == "__main__":
+    main()
