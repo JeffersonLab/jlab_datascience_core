@@ -2,7 +2,7 @@ import yaml
 import inspect
 import numpy as np
 import pandas as pd
-from jlab_datascience_toolkit.core.jdst_data_prep import JDSTDataPrep
+from jlab_datascience_toolkit.cores.jdst_data_prep import JDSTDataPrep
 
 
 class SplitDataFrame(JDSTDataPrep):

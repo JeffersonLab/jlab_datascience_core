@@ -1,11 +1,11 @@
 import yaml
 import argparse
-import seaborn as sns
 from sklearn.preprocessing import StandardScaler
-from jlab_datascience_toolkit.data_prep import make as make_prep
+from jlab_datascience_toolkit.data_parsers import make as make_parser
+from jlab_datascience_toolkit.data_preps import make as make_prep
 from jlab_datascience_toolkit.models import make as make_model
 from jlab_datascience_toolkit.trainers import make as make_trainer
-from jlab_datascience_toolkit.analysis import make as make_analysis
+from jlab_datascience_toolkit.analyses import make as make_analysis
 
 
 if __name__ == "__main__":
@@ -19,21 +19,26 @@ if __name__ == "__main__":
     parser.add_argument(
         "--logdir",
         type=str,
-        default="./",
+        default="./my_results/",
         help="Path logging directory. If None, analysis figures will not be saved.",
     )
     args = parser.parse_args()
     args = vars(args)  # convert args from argparse.Namespace to dict
 
-    with open(args["cfg_file"], "r") as file:
+    cfg_file = args['cfg_file']
+    logdir = args['logdir']
+
+    with open(cfg_file, "r") as file:
         configs = yaml.safe_load(file)
+        parser_configs = configs["parser_configs"]
         prep_configs = configs["prep_configs"]
         model_configs = configs["model_configs"]
         trainer_configs = configs["trainer_configs"]
         analysis_configs = configs["analysis_configs"]
 
     # 1) Load Data
-    df = sns.load_dataset("iris")
+    parser = make_parser(parser_configs["registered_name"], configs=parser_configs)
+    df = parser.load_data()
     classes_list = [(c, i) for i, c in enumerate(df["species"].unique().tolist())]
     df["species_int"] = df["species"].map(dict(classes_list))
 
@@ -53,7 +58,7 @@ if __name__ == "__main__":
     # 5) Train Model
     trainer = make_trainer(trainer_configs["registered_name"], configs=trainer_configs)
     history = trainer.fit(
-        model=model, x=x_train, y=y_train, validation_data=(x_val, y_val)
+        model=model, x=x_train, y=y_train, validation_data=(x_val, y_val), logdir=logdir
     )
 
     # 6) Analyze Model on test dataset

@@ -1,4 +1,4 @@
-from jlab_datascience_toolkit.core.jdst_data_parser import JDSTDataParser
+from jlab_datascience_toolkit.cores.jdst_data_parser import JDSTDataParser
 import numpy as np
 import yaml
 import logging

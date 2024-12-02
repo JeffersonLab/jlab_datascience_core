@@ -1,4 +1,4 @@
-from jlab_datascience_toolkit.core.jdst_data_parser import JDSTDataParser
+from jlab_datascience_toolkit.cores.jdst_data_parser import JDSTDataParser
 from jlab_datascience_toolkit.utils.io import save_yaml_config, load_yaml_config
 from pathlib import Path
 import pandas as pd
@@ -57,7 +57,6 @@ class Parser2DataFrame(JDSTDataParser):
         Calls load(path)
     save_config(path)
         Calls save(path)
-
     """
 
     def __init__(self, config: dict = None, registry_config: dict = None):

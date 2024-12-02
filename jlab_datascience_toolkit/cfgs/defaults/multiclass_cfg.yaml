@@ -45,6 +45,9 @@ model_configs:
       units: 3
     layer_type: Dense
   registered_name: KerasMLP_v0
+parser_configs:
+  registered_name: FamousDatasets_v0
+  dataset_name: iris
 prep_configs:
   feature_columns:
   - sepal_length
