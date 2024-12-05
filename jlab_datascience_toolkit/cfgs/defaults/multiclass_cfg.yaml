@@ -75,3 +75,4 @@ trainer_configs:
     learning_rate: 0.01
     optimizer_type: Adam
   registered_name: KerasTrainer_v0
+logdir: ./my_results/

@@ -2,6 +2,7 @@ import yaml
 import inspect
 import numpy as np
 import pandas as pd
+from typing import Union
 from jlab_datascience_toolkit.cores.jdst_data_prep import JDSTDataPrep
 
 
@@ -26,8 +27,8 @@ class SplitDataFrame(JDSTDataPrep):
     @staticmethod
     def split_by_columns(
         df: pd.DataFrame,
-        feature_columns: list[str] | str,
-        target_columns: list[str] | str,
+        feature_columns: Union[list[str],str],
+        target_columns: Union[list[str],str],
     ) -> list[np.ndarray]:
         if feature_columns is None:
             x = df.to_numpy()

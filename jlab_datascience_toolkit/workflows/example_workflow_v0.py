@@ -1,5 +1,6 @@
 import yaml
-import argparse
+import hydra
+from omegaconf import OmegaConf, DictConfig
 from sklearn.preprocessing import StandardScaler
 from jlab_datascience_toolkit.data_parsers import make as make_parser
 from jlab_datascience_toolkit.data_preps import make as make_prep
@@ -7,34 +8,15 @@ from jlab_datascience_toolkit.models import make as make_model
 from jlab_datascience_toolkit.trainers import make as make_trainer
 from jlab_datascience_toolkit.analyses import make as make_analysis
 
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--cfg_file",
-        type=str,
-        default="../cfgs/defaults/multiclass_cfg.yaml",
-        help="Path to yaml configuration file",
-    )
-    parser.add_argument(
-        "--logdir",
-        type=str,
-        default="./my_results/",
-        help="Path logging directory. If None, analysis figures will not be saved.",
-    )
-    args = parser.parse_args()
-    args = vars(args)  # convert args from argparse.Namespace to dict
-
-    cfg_file = args['cfg_file']
-    logdir = args['logdir']
-
-    with open(cfg_file, "r") as file:
-        configs = yaml.safe_load(file)
-        parser_configs = configs["parser_configs"]
-        prep_configs = configs["prep_configs"]
-        model_configs = configs["model_configs"]
-        trainer_configs = configs["trainer_configs"]
-        analysis_configs = configs["analysis_configs"]
+@hydra.main(version_base=None, config_path="../cfgs/defaults", config_name="multiclass_cfg")
+def main(configs: DictConfig):
+    configs = OmegaConf.to_container(configs)    # convert DictConfig ==> dict
+    logdir = configs["logdir"]
+    parser_configs = configs["parser_configs"]
+    prep_configs = configs["prep_configs"]
+    model_configs = configs["model_configs"]
+    trainer_configs = configs["trainer_configs"]
+    analysis_configs = configs["analysis_configs"]
 
     # 1) Load Data
     parser = make_parser(parser_configs["registered_name"], configs=parser_configs)
@@ -72,6 +54,10 @@ if __name__ == "__main__":
         y_pred,
         labels=[tup[1] for tup in classes_list],
         target_names=[tup[0] for tup in classes_list],
-        logdir=args["logdir"],
+        logdir=logdir,
     )
     print(results)
+
+
+if __name__ == "__main__":
+    main()
