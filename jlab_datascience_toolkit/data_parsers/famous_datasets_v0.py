@@ -44,6 +44,7 @@ class FamousDatasetsV0(JDSTDataParser):
         Does nothing
     """
     def __init__(self, configs: dict):
+        self.configs = configs
         self.dataset_name = configs['dataset_name']
         self.settings = {k: v for k, v in configs.items() if k not in {'dataset_name', 'registered_name'}}
     
