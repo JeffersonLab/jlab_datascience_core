@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from sklearn.metrics import confusion_matrix, accuracy_score, classification_report
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, accuracy_score, classification_report
 import matplotlib.pyplot as plt
 
 
@@ -17,6 +17,8 @@ class Analysis:
         sample_weight: np.ndarray = None,
         logdir: str = None,
     ) -> list:
+        if logdir is not None:
+            os.makedirs(logdir, exist_ok=True)
         ans = []
         for submodule in self.configs["submodules"]:
             submodule_type = submodule["type"]
@@ -30,14 +32,19 @@ class Analysis:
                     **submodule_configs,
                 )
                 ans.append(cm)
-                if logdir:
+                if logdir is not None:
                     np.save(os.path.join(logdir, "confusion_matrix.npy"), cm)
+                    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=target_names)
+                    disp.plot()
+                    plt.tight_layout()
+                    plt.savefig(os.path.join(logdir, "confusion_matrix.jpg"), transparent=True, dpi=300)
+                    plt.close()
             elif submodule_type == "accuracy_score":
                 acc = accuracy_score(
                     y_true, y_pred, sample_weight=sample_weight, **submodule_configs
                 )
                 ans.append(acc)
-                if logdir:
+                if logdir is not None:
                     np.save(os.path.join(logdir, "accuracy_score.npy"), acc)
             elif submodule_type == "classification_report":
                 cr = classification_report(
@@ -49,7 +56,7 @@ class Analysis:
                     **submodule_configs,
                 )
                 ans.append(cr)
-                if logdir and isinstance(cr, dict):
+                if (logdir is not None) and isinstance(cr, dict):
                     for metric in ["precision", "recall", "f1-score"]:
                         metric_list = []
                         for k, v in cr.items():

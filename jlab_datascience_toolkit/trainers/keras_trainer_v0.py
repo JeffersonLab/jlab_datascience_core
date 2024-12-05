@@ -1,8 +1,10 @@
+import os
 import yaml
 import logging
 import keras
 import inspect
-from jlab_datascience_toolkit.core.jdst_trainer import JDSTTrainer
+from matplotlib import pyplot as plt
+from jlab_datascience_toolkit.cores.jdst_trainer import JDSTTrainer
 
 
 trainer_log = logging.getLogger("Trainer Logger")
@@ -96,7 +98,7 @@ class Trainer(JDSTTrainer):
                 'Make sure indices of classes in "class_weight" match indices of "y" !'
             )
 
-    def fit(self, model, x=None, y=None, validation_data=None, sample_weight=None):
+    def fit(self, model, x=None, y=None, validation_data=None, sample_weight=None, logdir=None):
         model.model.compile(optimizer=self.optimizer, loss=self.loss)
         history = model.model.fit(
             x=x,
@@ -105,6 +107,19 @@ class Trainer(JDSTTrainer):
             sample_weight=sample_weight,
             **self.settings,
         )
+        if logdir is not None:
+            os.makedirs(logdir, exist_ok=True)
+            fig, ax = plt.subplots()
+            ax.plot(history.history['loss'], color='blue', label='Train')
+            if validation_data is not None:
+                ax.plot(history.history['val_loss'], color='red', label='Validation')
+                ax.legend()
+            ax.set_xlabel('Epoch')
+            ax.set_ylabel(f'{self.loss.__class__.__name__} Loss')
+            ax.grid()
+            fig.tight_layout()
+            fig.savefig(os.path.join(logdir, 'learning_curve.jpg'), transparent=True, dpi=300)
+            plt.close(fig=fig)
         return history
 
     def get_info(self):

@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import pandas as pd
-from jlab_datascience_toolkit.data_prep.split_dataframe_v0 import SplitDataFrame
+from jlab_datascience_toolkit.data_preps.split_dataframe_v0 import SplitDataFrame
 
 
 class TestSplitDataFrame(unittest.TestCase):

@@ -1,4 +1,4 @@
-from jlab_datascience_toolkit.core.jdst_data_prep import JDSTDataPrep
+from jlab_datascience_toolkit.cores.jdst_data_prep import JDSTDataPrep
 from jlab_datascience_toolkit.utils.io import save_yaml_config, load_yaml_config
 from pathlib import Path
 import pandas as pd

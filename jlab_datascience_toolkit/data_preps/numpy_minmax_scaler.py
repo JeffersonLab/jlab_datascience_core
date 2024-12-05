@@ -1,4 +1,4 @@
-from jlab_datascience_toolkit.core.jdst_data_prep import JDSTDataPrep
+from jlab_datascience_toolkit.cores.jdst_data_prep import JDSTDataPrep
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 import logging
