@@ -11,7 +11,9 @@ from jlab_datascience_toolkit.analyses import make as make_analysis
 @hydra.main(version_base=None, config_path="../cfgs/defaults", config_name="multiclass_cfg")
 def main(configs: DictConfig):
     configs = OmegaConf.to_container(configs)    # convert DictConfig ==> dict
-    logdir = configs["logdir"]
+    logdir = configs.get("logdir", None)
+    if logdir is None:
+        logdir = hydra.core.hydra_config.HydraConfig.get().runtime.output_dir
     parser_configs = configs["parser_configs"]
     prep_configs = configs["prep_configs"]
     model_configs = configs["model_configs"]
