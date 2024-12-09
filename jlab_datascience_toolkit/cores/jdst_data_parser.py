@@ -1,4 +1,4 @@
-from jlab_datascience_toolkit.core.jdst_module import JDSTModule
+from jlab_datascience_toolkit.cores.jdst_module import JDSTModule
 from abc import ABC, abstractmethod
 
 

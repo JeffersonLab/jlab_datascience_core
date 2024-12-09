@@ -1,27 +1,28 @@
 import yaml
-import argparse
-import seaborn as sns
 import hydra
+from omegaconf import OmegaConf, DictConfig
 from sklearn.preprocessing import StandardScaler
-from jlab_datascience_toolkit.data_prep import make as make_prep
+from jlab_datascience_toolkit.data_parsers import make as make_parser
+from jlab_datascience_toolkit.data_preps import make as make_prep
 from jlab_datascience_toolkit.models import make as make_model
 from jlab_datascience_toolkit.trainers import make as make_trainer
-from jlab_datascience_toolkit.analysis import make as make_analysis
-from omegaconf import OmegaConf
+from jlab_datascience_toolkit.analyses import make as make_analysis
 
 @hydra.main(version_base=None, config_path="../cfgs/defaults", config_name="multiclass_cfg")
-def main(cfg):
-
-    args = {"logdir": cfg["logdir"]}
-
-    configs = OmegaConf.to_container(cfg)
+def main(configs: DictConfig):
+    configs = OmegaConf.to_container(configs)    # convert DictConfig ==> dict
+    logdir = configs.get("logdir", None)
+    if logdir is None:
+        logdir = hydra.core.hydra_config.HydraConfig.get().runtime.output_dir
+    parser_configs = configs["parser_configs"]
     prep_configs = configs["prep_configs"]
     model_configs = configs["model_configs"]
     trainer_configs = configs["trainer_configs"]
     analysis_configs = configs["analysis_configs"]
 
     # 1) Load Data
-    df = sns.load_dataset("iris")
+    parser = make_parser(parser_configs["registered_name"], configs=parser_configs)
+    df = parser.load_data()
     classes_list = [(c, i) for i, c in enumerate(df["species"].unique().tolist())]
     df["species_int"] = df["species"].map(dict(classes_list))
 
@@ -41,7 +42,7 @@ def main(cfg):
     # 5) Train Model
     trainer = make_trainer(trainer_configs["registered_name"], configs=trainer_configs)
     history = trainer.fit(
-        model=model, x=x_train, y=y_train, validation_data=(x_val, y_val)
+        model=model, x=x_train, y=y_train, validation_data=(x_val, y_val), logdir=logdir
     )
 
     # 6) Analyze Model on test dataset
@@ -55,7 +56,7 @@ def main(cfg):
         y_pred,
         labels=[tup[1] for tup in classes_list],
         target_names=[tup[0] for tup in classes_list],
-        logdir=args["logdir"],
+        logdir=logdir,
     )
     print(results)
 

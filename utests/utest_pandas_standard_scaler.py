@@ -1,4 +1,4 @@
-from jlab_datascience_toolkit.data_prep import make
+from jlab_datascience_toolkit.data_preps import make
 import unittest
 import logging
 import matplotlib.pyplot as plt

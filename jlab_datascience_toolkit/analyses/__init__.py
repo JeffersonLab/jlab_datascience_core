@@ -6,5 +6,5 @@ from jlab_datascience_toolkit.utils.registration import (
 
 register(
     id="MultiClassClassificationAnalysis_v0",
-    entry_point="jlab_datascience_toolkit.analysis.multiclass_analysis_v0:Analysis",
+    entry_point="jlab_datascience_toolkit.analyses.multiclass_analysis_v0:Analysis",
 )

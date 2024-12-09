@@ -1,4 +1,4 @@
-import jlab_datascience_toolkit.data_parser as parsers
+import jlab_datascience_toolkit.data_parsers as parsers
 import unittest
 import numpy as np
 import matplotlib.pyplot as plt

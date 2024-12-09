@@ -2,7 +2,7 @@ import os
 import yaml
 import keras
 import inspect
-from jlab_datascience_toolkit.core.jdst_model import JDSTModel
+from jlab_datascience_toolkit.cores.jdst_model import JDSTModel
 
 
 class KerasMLP(JDSTModel):
