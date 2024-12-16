@@ -1,8 +1,5 @@
 from typing import NamedTuple, Union, Iterable
-from Hall_B.AIDAPT.registration import make 
-import Hall_B.AIDAPT.data_parsers
-import Hall_B.AIDAPT.data_prep
-import Hall_B.AIDAPT.models
+from jlab_datascience_toolkit.utils.registration import make 
     
 class GraphRuntime():
     class Edge(NamedTuple):
@@ -33,19 +30,20 @@ class GraphRuntime():
 
         return dict.fromkeys(distinct_data, None)
     
-    def get_module_dict(self, modules, config):
+    def get_module_dict(self, modules, config_kwargs_list):
         module_dict = dict.fromkeys(modules, None)
         for m_name in module_dict:
             module_id = modules[m_name]
             print(f'Making {m_name} with module ID: {module_id}')
-            module_dict[m_name] = make(module_id, config=config[m_name], name=m_name)
+            config_kwargs = config_kwargs_list[m_name]
+            module_dict[m_name] = make(module_id, **config_kwargs)
 
         return module_dict
     
-    def run_graph(self, graph, modules, config):
+    def run_graph(self, graph, modules, config_kwargs_list):
         graph_edges = self.tuples_to_edges(graph)
         data = self.get_distinct_data_dict(graph_edges)
-        module_dict = self.get_module_dict(modules, config)
+        module_dict = self.get_module_dict(modules, config_kwargs_list)
         for edge in graph_edges:
         
             if '.' in edge.function:
