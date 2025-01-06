@@ -40,7 +40,27 @@ class GraphRuntime():
 
         return module_dict
     
+    def get_args(self, data, module_dict, input):
+
+        split_input = input.split(sep=".")
+        if split_input[0] == "module":
+            data_in = module_dict[split_input[1]]
+        elif len(split_input) == 1:
+            data_in = data[input]
+        else:
+            raise KeyError(f"No input type: {split_input[0]}.")
+
+        return data_in
+
+    def convert_graph_lists_to_tuples(self, graph):
+        for edge in graph:
+            if isinstance(edge[0], list):
+                edge[0] = tuple(edge[0])
+            if isinstance(edge[2], list):
+                edge[2] = tuple(edge[2])
+
     def run_graph(self, graph, modules, config_kwargs_list):
+        self.convert_graph_lists_to_tuples(graph)
         graph_edges = self.tuples_to_edges(graph)
         data = self.get_distinct_data_dict(graph_edges)
         module_dict = self.get_module_dict(modules, config_kwargs_list)
@@ -55,9 +75,10 @@ class GraphRuntime():
             if edge.input is None:
                 fn_in = [] #Unpacks to 0 arguments
             elif isinstance(edge.input, str):
-                fn_in = [data[edge.input]] # Unpacks to 1 argument
+                data_in = self.get_args(data, module_dict, edge.input)
+                fn_in = [data_in] # Unpacks to 1 argument
             elif isinstance(edge.input, Iterable):
-                fn_in = [data[val] for val in edge.input]
+                fn_in = [self.get_args(data, module_dict, val) for val in edge.input]
             
             # Take advantage of list unpacking for arguments
             out = fn(*fn_in)
@@ -73,3 +94,6 @@ class GraphRuntime():
 
     def combine(self, *inputs):
         return inputs
+
+    def print(self, input):
+        print(input)

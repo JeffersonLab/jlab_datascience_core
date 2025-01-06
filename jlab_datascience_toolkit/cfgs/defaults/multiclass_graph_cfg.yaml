@@ -1,0 +1,132 @@
+logdir: ${hydra:runtime.output_dir}
+graph: 
+  - - null
+    - parser.load_data
+    - df
+  - - df
+    - map_species
+    - [df, labels, target_names]
+  - - df
+    - prep.run
+    - [x_train, x_val, x_test, y_train, y_val, y_test]
+  - - x_train
+    - scaler.fit_transform
+    - x_train
+  - - x_val
+    - scaler.transform
+    - x_val
+  - - x_test
+    - scaler.transform
+    - x_test
+  - - [x_val, y_val]
+    - combine
+    - validation_data
+  - - [module.model, x_train, y_train, validation_data]
+    - trainer.fit
+    - history
+  - - x_test
+    - model.predict
+    - y_pred
+  - - y_pred
+    - argmax
+    - y_pred
+  - - [y_test, y_pred, labels, target_names]
+    - analysis.run
+    - results
+  - - results
+    - print
+    - null
+modules: 
+  parser: FamousDatasets_v0
+  prep: SplitDataFrame_v0
+  model: KerasMLP_v0
+  trainer: KerasTrainer_v0
+  analysis: MultiClassClassificationAnalysis_v0
+  scaler: SKLearnStandardScaler
+kwargs_list: 
+  scaler: {}
+  parser: 
+    configs:
+      registered_name: FamousDatasets_v0
+      dataset_name: iris
+  prep: 
+    configs:
+      feature_columns:
+      - sepal_length
+      - sepal_width
+      - petal_length
+      - petal_width
+      registered_name: SplitDataFrame_v0
+      rows_fractions:
+      - 0.7
+      - 0.15
+      - 0.15
+      target_columns: species_int
+  model:
+    configs:
+      input_dim: 4
+      layers_dicts:
+      - layer_configs:
+          activation: relu
+          units: 10
+        layer_type: Dense
+      - layer_type: BatchNormalization
+      - layer_configs:
+          rate: 0.05
+        layer_type: Dropout
+      - layer_configs:
+          activation: relu
+          units: 20
+        layer_type: Dense
+      - layer_type: BatchNormalization
+      - layer_configs:
+          rate: 0.05
+        layer_type: Dropout
+      - layer_configs:
+          activation: relu
+          units: 10
+        layer_type: Dense
+      - layer_type: BatchNormalization
+      - layer_configs:
+          rate: 0.05
+        layer_type: Dropout
+      - layer_configs:
+          activation: relu
+          units: 5
+        layer_type: Dense
+      - layer_type: BatchNormalization
+      - layer_configs:
+          activation: softmax
+          units: 3
+        layer_type: Dense
+      registered_name: KerasMLP_v0
+  trainer:
+    configs:
+      logdir: ${logdir}
+      callbacks:
+      - callback_type: EarlyStopping
+        monitor: val_loss
+        patience: 50
+      - callback_type: ReduceLROnPlateau
+        monitor: val_loss
+        patience: 10
+      epochs: 400
+      loss_configs:
+        loss_type: SparseCategoricalCrossentropy
+      optimizer_configs:
+        learning_rate: 0.01
+        optimizer_type: Adam
+      registered_name: KerasTrainer_v0
+  analysis:
+    configs:
+      logdir: ${logdir}
+      registered_name: MultiClassClassificationAnalysis_v0
+      submodules:
+      - type: confusion_matrix
+      - configs:
+          normalize: true
+        type: accuracy_score
+      - type: classification_report
+        configs:
+          output_dict: true
+          

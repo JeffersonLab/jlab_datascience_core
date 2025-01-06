@@ -17,6 +17,10 @@ class Analysis:
         sample_weight: np.ndarray = None,
         logdir: str = None,
     ) -> list:
+        if "logdir" in self.configs:
+            if logdir is None:
+                logdir = self.configs["logdir"]
+
         if logdir is not None:
             os.makedirs(logdir, exist_ok=True)
         ans = []
