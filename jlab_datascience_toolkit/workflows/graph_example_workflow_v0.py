@@ -22,7 +22,7 @@ register(id="SKLearnStandardScaler", entry_point=StandardScaler)
 @hydra.main(version_base=None, config_path="../cfgs/defaults", config_name="multiclass_graph_cfg")
 def main(configs: DictConfig):
 
-    configs = OmegaConf.to_container(configs)    # convert DictConfig ==> dict
+    configs = OmegaConf.to_container(configs, resolve=True)    # convert DictConfig ==> dict
 
     graph = configs["graph"]
     modules = configs["modules"]
@@ -30,10 +30,6 @@ def main(configs: DictConfig):
 
     graph_runtime = CustomGraphRuntime()
     data, module_dict = graph_runtime.run_graph(graph=graph, modules=modules, config_kwargs_list=config_kwargs_list)
-
-    # logdir = configs.get("logdir", None)
-    # if logdir is None:
-    #     logdir = hydra.core.hydra_config.HydraConfig.get().runtime.output_dir
 
 if __name__ == "__main__":
     main()

@@ -99,6 +99,11 @@ class Trainer(JDSTTrainer):
             )
 
     def fit(self, model, x=None, y=None, validation_data=None, sample_weight=None, logdir=None):
+        if "logdir" in self.configs:
+            if logdir is None:
+                logdir = self.configs["logdir"]
+            self.settings.pop("logdir")
+            
         model.model.compile(optimizer=self.optimizer, loss=self.loss)
         history = model.model.fit(
             x=x,
