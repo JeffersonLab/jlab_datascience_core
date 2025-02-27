@@ -1,4 +1,4 @@
-from jlab_datascience_toolkit.utils.registration import (
+from jlab_datascience_toolkit.agents.registration import (
     register,
     make,
     list_registered_modules,
