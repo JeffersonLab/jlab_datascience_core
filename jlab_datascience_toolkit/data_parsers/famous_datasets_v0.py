@@ -1,8 +1,10 @@
 from jlab_datascience_toolkit.cores.jdst_data_parser import JDSTDataParser
 import seaborn as sns
 import inspect
+import logging
 import yaml
 
+test_log = logging.Logger(__name__)
 
 class FamousDatasetsV0(JDSTDataParser):
     """Returns one of the example famous datasets such as iris.
@@ -43,11 +45,14 @@ class FamousDatasetsV0(JDSTDataParser):
     save_data()
         Does nothing
     """
-    def __init__(self, configs: dict):
-        self.configs = configs
-        self.dataset_name = configs['dataset_name']
-        self.settings = {k: v for k, v in configs.items() if k not in {'dataset_name', 'registered_name'}}
-    
+    def __init__(self, config: dict):
+        self.configs = config
+        try:
+          self.dataset_name = config['dataset_name']
+          self.settings = {k: v for k, v in config.items() if k not in {'dataset_name', 'registered_name'}}
+        except:
+          test_log.error(">>> No valid configuration provided <<<")
+
     def load_data(self):
         if self.dataset_name == 'iris':
             return sns.load_dataset('iris', **self.settings)

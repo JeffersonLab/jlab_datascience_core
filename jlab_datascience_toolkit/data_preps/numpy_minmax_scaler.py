@@ -10,21 +10,22 @@ class NumpyMinMaxScaler(JDSTDataPrep):
 
     # Initialize:
     # *********************************************
-    def __init__(self, path_to_cfg, user_config={}):
+    def __init__(self, config, user_config={}):
         # Set the name specific to this module:
         self.module_name = "numpy_minmax_scaler"
 
         # Load the configuration:
-        self.config = self.load_config(path_to_cfg, user_config)
+        self.config = self.load_config(config, user_config)
 
         # Save this config, if a path is provided:
         if "store_cfg_loc" in self.config:
             self.save_config(self.config["store_cfg_loc"])
 
         # Set up the scaler:
-        try:
+        if bool(self.config):
+         try:
             self.scaler = MinMaxScaler(self.config["feature_range"])
-        except:
+         except:
             logging.exception(
                 ">>> "
                 + self.module_name
@@ -39,7 +40,7 @@ class NumpyMinMaxScaler(JDSTDataPrep):
         print("  ")
         print("***   Info: NumpyMinMaxScaler   ***")
         print("Input(s):")
-        print("i) Full path to .yaml configuration file ")
+        print("i) Full configuration file ")
         print(
             "ii) Optional: User configuration, i.e. a python dict with additonal / alternative settings"
         )
@@ -62,25 +63,27 @@ class NumpyMinMaxScaler(JDSTDataPrep):
     # Handle configurations:
     # *********************************************
     # Load the config:
-    def load_config(self, path_to_cfg, user_config):
-        with open(path_to_cfg, "r") as file:
-            cfg = yaml.safe_load(file)
+    def load_config(self, config, user_config):
+        if config is not None:
 
-        # Overwrite config with user settings, if provided
-        try:
+          # Overwrite config with user settings, if provided
+         try:
             if bool(user_config):
                 # ++++++++++++++++++++++++
                 for key in user_config:
-                    cfg[key] = user_config[key]
+                    config[key] = user_config[key]
                 # ++++++++++++++++++++++++
-        except:
+         except:
             logging.exception(
                 ">>> "
                 + self.module_name
                 + ": Invalid user config. Please make sure that a dictionary is provided <<<"
             )
 
-        return cfg
+         return config
+        
+        else:
+            return {}
 
     # -----------------------------
 

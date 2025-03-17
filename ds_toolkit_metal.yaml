@@ -26,3 +26,5 @@ dependencies:
     - imageio
     - scikit-image
     - optuna
+    - seaborn
+    - hydra-core

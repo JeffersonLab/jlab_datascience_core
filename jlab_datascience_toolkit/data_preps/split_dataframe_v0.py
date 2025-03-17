@@ -12,17 +12,18 @@ class SplitDataFrame(JDSTDataPrep):
     Each array is then splitted by rows according to the given rows_fractions (which must add up to one).
     """
 
-    def __init__(self, configs: dict):
-        self.configs = configs
-        self.feature_columns = configs.get(
+    def __init__(self, config: dict):
+        self.configs = config
+        if bool(self.configs):
+         self.feature_columns = config.get(
             "feature_columns", None
-        )  # If None, all columns are considered
-        self.target_columns = configs.get(
+         )  # If None, all columns are considered
+         self.target_columns = config.get(
             "target_columns", None
-        )  # If None, there will be no target array
-        self.rows_fractions = configs.get("rows_fractions", [1.0])
-        self.random_state = configs.get("random_state", None)
-        assert sum(self.rows_fractions) == 1, "Fractions must add up to 1 !!!"
+         )  # If None, there will be no target array
+         self.rows_fractions = config.get("rows_fractions", [1.0])
+         self.random_state = config.get("random_state", None)
+         assert sum(self.rows_fractions) == 1, "Fractions must add up to 1 !!!"
 
     @staticmethod
     def split_by_columns(

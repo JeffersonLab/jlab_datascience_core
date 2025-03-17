@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 
 
 class Analysis:
-    def __init__(self, configs: dict):
-        self.configs = configs
+    def __init__(self, config: dict):
+        self.configs = config
 
     def run(
         self,
