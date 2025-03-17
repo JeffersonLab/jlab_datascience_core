@@ -53,14 +53,13 @@ class UTestNumpyParser(unittest.TestCase):
         # so we need to provide an additional config that allows us to overwrite the default setting (which is simply "")
         print("Load numpy parser...")
 
-        parser_cfg = {"data_loc": data_locs}
-        this_file_loc = os.path.dirname(__file__)
-        cfg_loc = os.path.join(
-            this_file_loc,
-            "../jlab_datascience_toolkit/cfgs/defaults/numpy_parser_cfg.yaml",
-        )
+        parser_cfg = {
+            "data_loc": data_locs,
+            "event_axis":0,
+            "dtype":"float32"
+        }
         npy_parser = parsers.make(
-            "NumpyParser_v0", path_to_cfg=cfg_loc, user_config=parser_cfg
+            "NumpyParser_v0", config=parser_cfg
         )
 
         # Lets see if we can call the information about this module:

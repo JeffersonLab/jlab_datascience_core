@@ -23,7 +23,7 @@ class TestKerasMLP(unittest.TestCase):
                 },
             ],
         }
-        cls.model = make_model(cls.configs["registered_name"], configs=cls.configs)
+        cls.model = make_model(cls.configs["registered_name"], config=cls.configs)
         cls.x = np.random.rand(100, 4)
         cls.model_folder = "./model_folder/"
 
@@ -34,7 +34,7 @@ class TestKerasMLP(unittest.TestCase):
     def test_save_and_load(self):
         y_pred_old = self.model.predict(self.x)
         self.model.save(self.model_folder)
-        model_new = make_model(self.configs["registered_name"], configs=self.configs)
+        model_new = make_model(self.configs["registered_name"], config=self.configs)
         model_new.load(self.model_folder)
         y_pred_new = model_new.predict(self.x)
         self.assertTrue(np.array_equal(y_pred_old, y_pred_new))

@@ -21,13 +21,13 @@ def main(configs: DictConfig):
     analysis_configs = configs["analysis_configs"]
 
     # 1) Load Data
-    parser = make_parser(parser_configs["registered_name"], configs=parser_configs)
+    parser = make_parser(parser_configs["registered_name"], config=parser_configs)
     df = parser.load_data()
     classes_list = [(c, i) for i, c in enumerate(df["species"].unique().tolist())]
     df["species_int"] = df["species"].map(dict(classes_list))
 
     # 2) Split Data
-    prep = make_prep(prep_configs["registered_name"], configs=prep_configs)
+    prep = make_prep(prep_configs["registered_name"], config=prep_configs)
     x_train, x_val, x_test, y_train, y_val, y_test = prep.run(df)
 
     # 3) Scaling
@@ -37,10 +37,10 @@ def main(configs: DictConfig):
     x_test = scaler.transform(x_test)
 
     # 4) Define Model
-    model = make_model(model_configs["registered_name"], configs=model_configs)
+    model = make_model(model_configs["registered_name"], config=model_configs)
 
     # 5) Train Model
-    trainer = make_trainer(trainer_configs["registered_name"], configs=trainer_configs)
+    trainer = make_trainer(trainer_configs["registered_name"], config=trainer_configs)
     history = trainer.fit(
         model=model, x=x_train, y=y_train, validation_data=(x_val, y_val), logdir=logdir
     )
@@ -49,7 +49,7 @@ def main(configs: DictConfig):
     y_pred = model.predict(x_test)  # (n_samples, c_classes)
     y_pred = y_pred.argmax(axis=1)  # (n_samples)
     multiclass_ana = make_analysis(
-        analysis_configs["registered_name"], configs=analysis_configs
+        analysis_configs["registered_name"], config=analysis_configs
     )
     results = multiclass_ana.run(
         y_test,

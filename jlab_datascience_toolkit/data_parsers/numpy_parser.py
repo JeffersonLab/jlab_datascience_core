@@ -13,7 +13,7 @@ class NumpyParser(JDSTDataParser):
     ii) Combine single .npy files into one
 
     Input(s):
-    i) Full path to .yaml configuration file
+    i) Configuration file
     ii) Optional: User configuration, i.e. a python dict with additonal / alternative settings
 
     Output(s):
@@ -22,12 +22,12 @@ class NumpyParser(JDSTDataParser):
 
     # Initialize:
     # *********************************************
-    def __init__(self, path_to_cfg, user_config={}):
+    def __init__(self, config, user_config={}):
         # Set the name specific to this module:
         self.module_name = "numpy_parser"
 
         # Load the configuration:
-        self.config = self.load_config(path_to_cfg, user_config)
+        self.config = self.load_config(config, user_config)
 
         # Save this config, if a path is provided:
         if "store_cfg_loc" in self.config:
@@ -35,7 +35,7 @@ class NumpyParser(JDSTDataParser):
 
         # Run sanity check(s):
         # i) Make sure that the provide data path(s) are list objects:
-        if isinstance(self.config["data_loc"], list) == False:
+        if bool(self.config) and isinstance(self.config["data_loc"], list) == False:
             logging.error(
                 ">>> "
                 + self.module_name
@@ -54,25 +54,24 @@ class NumpyParser(JDSTDataParser):
     # Handle configurations:
     # *********************************************
     # Load the config:
-    def load_config(self, path_to_cfg, user_config):
-        with open(path_to_cfg, "r") as file:
-            cfg = yaml.safe_load(file)
-
-        # Overwrite config with user settings, if provided
-        try:
+    def load_config(self, config, user_config):
+        if config is not None:
+          try:
             if bool(user_config):
                 # ++++++++++++++++++++++++
                 for key in user_config:
-                    cfg[key] = user_config[key]
+                    config[key] = user_config[key]
                 # ++++++++++++++++++++++++
-        except:
+          except:
             logging.exception(
                 ">>> "
                 + self.module_name
                 + ": Invalid user config. Please make sure that a dictionary is provided <<<"
             )
+        else:
+            config = {}
 
-        return cfg
+        return config
 
     # -----------------------------
 

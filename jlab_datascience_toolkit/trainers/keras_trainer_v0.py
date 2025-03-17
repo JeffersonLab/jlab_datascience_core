@@ -52,10 +52,10 @@ class Trainer(JDSTTrainer):
         Satatic method loading configurations from a given path
     """
 
-    def __init__(self, configs: dict):
-        self.configs = configs
+    def __init__(self, config: dict):
+        self.configs = config
         self.settings = (
-            configs.copy()
+            config.copy()
         )  # Must be separate from configs as it can include actual keras callback objects
         self.settings.pop("registered_name")
 

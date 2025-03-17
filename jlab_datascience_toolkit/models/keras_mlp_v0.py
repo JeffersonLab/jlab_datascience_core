@@ -10,7 +10,7 @@ class KerasMLP(JDSTModel):
     Defines an MLP model. self is not a keras.Model itself. Instead, it has a "model" attribute which is a keras.Model.
     """
 
-    def __init__(self, configs: dict):
+    def __init__(self, config: dict):
         """
         configs has the following keywords:
         1) 'input_dim'
@@ -19,10 +19,11 @@ class KerasMLP(JDSTModel):
             2.2) 'layer_type': 'Dropout', 'layer_configs': keras Dropout layer configs
             2.3) 'layer_type': 'BatchNormalization', 'layer_configs': keras BN layer cnfigs
         """
-        self.configs = configs
-        inputs = keras.layers.Input(shape=(configs["input_dim"],))
-        outputs = inputs
-        for layer_dict in configs["layers_dicts"]:
+        self.configs = config
+        if bool(self.configs):
+          inputs = keras.layers.Input(shape=(config["input_dim"],))
+          outputs = inputs
+          for layer_dict in config["layers_dicts"]:
             layer_type = layer_dict["layer_type"]
             layer_configs = layer_dict.get("layer_configs", {})
             if layer_type == "Dense":
@@ -33,7 +34,7 @@ class KerasMLP(JDSTModel):
                 outputs = keras.layers.BatchNormalization(**layer_configs)(outputs)
             else:
                 raise NameError("Unrecognized layer_type !!!")
-        self.model = keras.models.Model(inputs=inputs, outputs=outputs)
+          self.model = keras.models.Model(inputs=inputs, outputs=outputs)
 
     def predict(self, x):
         y = self.model.predict(x)

@@ -38,15 +38,9 @@ class UTestNumpyMinMaxScaler(unittest.TestCase):
         # Now load the scaler by defining a user config first:
         print("Load numpy min max scaler...")
 
-        this_file_loc = os.path.dirname(__file__)
-        cfg_loc = os.path.join(
-            this_file_loc,
-            "../jlab_datascience_toolkit/cfgs/defaults/numpy_minmax_scaler_cfg.yaml",
-        )
-        param_store_loc = this_file_loc + "/numpy_minmax_scaler_params"
-        scaler_cfg = {"feature_range": (-1.0, 1.0), "store_loc": param_store_loc}
+        scaler_cfg = {"feature_range": (-1.0, 1.0), "store_loc": "numpy_minmax_scaler_params"}
         npy_scaler = preps.make(
-            "NumpyMinMaxScaler_v0", path_to_cfg=cfg_loc, user_config=scaler_cfg
+            "NumpyMinMaxScaler_v0", config=scaler_cfg
         )
 
         # Print the module info:
