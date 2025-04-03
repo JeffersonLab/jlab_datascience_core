@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Model, Input
-from jlab_datascience_toolkit.utils.keras_layers.GP_layer import GaussianProcessLayer
+from jlab_datascience_toolkit.utils.keras_layers.gpa_layer import GaussianProcessApproximationLayer
 
 @pytest.fixture
 def random_input():
@@ -11,14 +11,14 @@ def random_input():
 
 def test_layer_instantiation():
     try:
-        layer = GaussianProcessLayer()
+        layer = GaussianProcessApproximationLayer()
         assert layer is not None, "Failed to instantiate GaussianProcessLayer."
     except Exception as e:
         pytest.fail(f"Layer instantiation failed: {e}")
 
 
 def test_forward_pass(random_input):
-    layer = GaussianProcessLayer()
+    layer = GaussianProcessApproximationLayer()
     outputs = layer(random_input)
     assert len(outputs) == 2, "Output should contain mean and stddev."
     assert outputs[0].shape == (32, 1), f"Unexpected output shape: {outputs[0].shape}"
@@ -27,7 +27,7 @@ def test_forward_pass(random_input):
 
 def test_gradient_computation(random_input):
     inputs = Input(shape=(10,))
-    layer = GaussianProcessLayer()
+    layer = GaussianProcessApproximationLayer()
     outputs = layer(inputs)
     model = Model(inputs, outputs[0])
     model.compile(optimizer="adam", loss="mse")
@@ -36,7 +36,7 @@ def test_gradient_computation(random_input):
 
 
 def test_prior_reset():
-    layer = GaussianProcessLayer()
+    layer = GaussianProcessApproximationLayer()
     layer.build((None, 10))
     initial_prior = layer.prior.numpy()
     layer.reset_prior()
@@ -45,7 +45,7 @@ def test_prior_reset():
 
 
 def test_noise_scale_update():
-    layer = GaussianProcessLayer()
+    layer = GaussianProcessApproximationLayer()
     layer.build((None, 10))
     new_noise_scale = 0.01
     layer.set_noise_scale(new_noise_scale)
@@ -53,8 +53,7 @@ def test_noise_scale_update():
 
 
 def test_variance_calculation(random_input):
-    layer = GaussianProcessLayer()
+    layer = GaussianProcessApproximationLayer()
     _, variance = layer(random_input)
     assert variance.shape == (32, 1), "Variance output shape mismatch."
     assert np.all(variance.numpy() >= 0), "Variance should be non-negative."
-

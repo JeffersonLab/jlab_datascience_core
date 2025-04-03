@@ -12,7 +12,7 @@ class ClipByValue(Constraint):
     def __call__(self, w):
         return tf.clip_by_value(w, self.min_value, self.max_value)
 
-class GaussianProcessLayer(layers.Layer):
+class GaussianProcessApproximationLayer(layers.Layer):
     def __init__(
         self,
         n_fourier_features=1024,
@@ -29,7 +29,6 @@ class GaussianProcessLayer(layers.Layer):
         scale_features=False,
         momentum=0.1,
         do_custom_cov_update=False,
-        noise_bounds=(1e-6, 1e6),
         **kwargs
     ):
         super().__init__(trainable=trainable, name=name, **kwargs)
@@ -48,8 +47,7 @@ class GaussianProcessLayer(layers.Layer):
         self.scale_features = scale_features
         self.momentum = momentum
         self.do_custom_cov_update = do_custom_cov_update
-        self.noise_bounds = noise_bounds
-
+        
     def build(self, input_shape):
        if self.isotropic:
             self.length_scale = self.add_weight(
@@ -107,15 +105,6 @@ class GaussianProcessLayer(layers.Layer):
             constraint=ClipByValue(1e-6, 1e6),
             name="noise_scale"
         )
-
-
-        # self.noise_scale = tf.Variable(
-        #     self.initial_noise_scale,
-        #     dtype=tf.float32,
-        #     trainable=self.train_noise_scale,
-        #     constraint=lambda z: tf.clip_by_value(z, self.noise_bounds[0], self.noise_bounds[1]),
-        #     name='noise_scale'
-        # )
         
        self.rff_map = layers.Dense(
             self.n_fourier_features // 2,
@@ -128,50 +117,6 @@ class GaussianProcessLayer(layers.Layer):
        self.rff_output = layers.Dense(self.n_out, use_bias=False, name='GP_mean_pred')
         
        super().build(input_shape)
-        
-    # def call(self, inputs, training=None, return_features=False):
-    #     if training is None:
-    #         training = tf.keras.backend.learning_phase()
-
-    #     batch_size = tf.cast(tf.shape(inputs)[0], tf.float32)
-    #     x = tf.convert_to_tensor(inputs, dtype=self.dtype)
-    #     x = tf.cast(x, tf.float32)
-        
-    #     x = self.length_scale * x
-    #     x = self.rff_map(x)
-    #     x1 = tf.math.cos(x) 
-    #     x2 = tf.math.sin(x) 
-
-    #     ffs = layers.concatenate([x1, x2])
-        
-    #     if self.scale_features:
-    #         ffs = tf.math.sqrt(2.0 / self.n_fourier_features) * ffs
-        
-    #     ffs = tf.math.sqrt(self.constant_scale) * ffs
-    #     output = self.rff_output(ffs)
-        
-    #     if training:
-    #         if self.momentum > 0:
-    #             update_prior_op = (
-    #                 self.momentum * self.prior + (1 - self.momentum) * (tf.transpose(ffs) @ ffs / batch_size)
-    #             )
-    #         else:
-    #             update_prior_op = self.prior + tf.transpose(ffs) @ ffs
-    #         self.prior.assign(update_prior_op)  # Direct assignment
-
-    #         variances = self.calc_variance(ffs)
-    #     else:
-    #         if not self.do_custom_cov_update:
-    #             self.update_cov(self.prior)
-
-    #         variances = self.calc_variance(ffs)
-
-    #     stddevs = tf.math.sqrt(variances)
-    #     out = [output, stddevs[:, None]]
-    #     if return_features:
-    #         out.append(ffs)
-
-    #     return out
 
     def call(self, inputs, training=False, return_features=False):
         x = tf.cast(inputs, tf.float32)
