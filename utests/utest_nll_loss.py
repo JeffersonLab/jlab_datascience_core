@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 import tensorflow as tf
-from jlab_datascience_toolkit.utils.keras_losses.nll_loss import gp_nll_loss
+from jlab_datascience_toolkit.keras.losses.nll_loss_v0 import gp_nll_loss
 
 @pytest.fixture
 def random_data():

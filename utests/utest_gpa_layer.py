@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Model, Input
-from jlab_datascience_toolkit.utils.keras_layers.gpa_layer import GaussianProcessApproximationLayer
+from jlab_datascience_toolkit.keras.layers.gpa_layer_v0 import GaussianProcessApproximationLayer
 
 @pytest.fixture
 def random_input():

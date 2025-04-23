@@ -131,6 +131,7 @@ class GaussianProcessApproximationLayer(layers.Layer):
 
         ffs = tf.math.sqrt(self.constant_scale) * ffs
         output = self.rff_output(ffs)
+        print("the size of RFF is:", ffs.shape)
 
         batch_size = tf.cast(tf.shape(inputs)[0], tf.float32)
 
