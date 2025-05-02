@@ -15,11 +15,11 @@ def gp_nll_loss(pred, y, std):
         tf.Tensor: The computed NLL loss (scalar).
     """
     
-    sigma_star = tf.square(std) + 1e-5  # Adding a small constant for numerical stability
+    sigma2_star = tf.square(std) + 1e-5  # Adding a small constant for numerical stability
 
     # NLL calculation
-    term1 = tf.math.log(2 * np.pi * sigma_star)
-    term2 = tf.square(pred - y) / sigma_star
+    term1 = tf.math.log(2 * np.pi * sigma2_star)
+    term2 = tf.square(pred - y) / sigma2_star
     loss = tf.reduce_mean(0.5 * (term1 + term2))
 
     return loss
