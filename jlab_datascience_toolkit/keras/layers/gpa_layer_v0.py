@@ -29,6 +29,7 @@ class GaussianProcessApproximationLayer(layers.Layer):
         scale_features=False,
         momentum=0.1,
         do_custom_cov_update=False,
+        dropout_rate=0.2,
         **kwargs
     ):
         super().__init__(trainable=trainable, name=name, **kwargs)
@@ -47,6 +48,8 @@ class GaussianProcessApproximationLayer(layers.Layer):
         self.scale_features = scale_features
         self.momentum = momentum
         self.do_custom_cov_update = do_custom_cov_update
+        
+        self.dropout = tf.keras.layers.Dropout(dropout_rate)
         
     def build(self, input_shape):
        if self.isotropic:
@@ -119,6 +122,7 @@ class GaussianProcessApproximationLayer(layers.Layer):
        super().build(input_shape)
 
     def call(self, inputs, training=False, return_features=False):
+        
         x = tf.cast(inputs, tf.float32)
         x = self.length_scale * x
         x = self.rff_map(x)
@@ -130,21 +134,20 @@ class GaussianProcessApproximationLayer(layers.Layer):
             ffs = tf.math.sqrt(2.0 / self.n_fourier_features) * ffs
 
         ffs = tf.math.sqrt(self.constant_scale) * ffs
-        output = self.rff_output(ffs)
-        print("the size of RFF is:", ffs.shape)
+        x = self.dropout(ffs)
+        output = self.rff_output(x)
+        
+        new_prior = tf.stop_gradient(ffs)
 
         batch_size = tf.cast(tf.shape(inputs)[0], tf.float32)
 
         if training:
             update_prior_op = (
-                self.momentum * self.prior + (1 - self.momentum) * (tf.transpose(ffs) @ ffs / batch_size)
+                self.momentum * self.prior + (1 - self.momentum) * (tf.transpose(new_prior) @ new_prior / batch_size)
             )
             self.prior.assign(update_prior_op)
-            variances = self.calc_variance(ffs)
-        else:
-            if not self.do_custom_cov_update:
-                self.update_cov(self.prior)
-            variances = self.calc_variance(ffs)
+        
+        variances = self.calc_variance(ffs)
 
         stddevs = tf.math.sqrt(variances)
         result = [output, stddevs[:, None]]
