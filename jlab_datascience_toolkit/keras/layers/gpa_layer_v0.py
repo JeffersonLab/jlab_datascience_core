@@ -29,6 +29,7 @@ class GaussianProcessApproximationLayer(layers.Layer):
         scale_features=False,
         momentum=0.1,
         do_custom_cov_update=False,
+        sigma_scale=1.0,
         dropout_rate=0.2,
         **kwargs
     ):
@@ -48,6 +49,7 @@ class GaussianProcessApproximationLayer(layers.Layer):
         self.scale_features = scale_features
         self.momentum = momentum
         self.do_custom_cov_update = do_custom_cov_update
+        self.initial_sigma_scale = sigma_scale
         
         self.dropout = tf.keras.layers.Dropout(dropout_rate)
         
@@ -80,6 +82,15 @@ class GaussianProcessApproximationLayer(layers.Layer):
             dtype=tf.float32,
             constraint=ClipByValue(1e-6, 1e6),
             name='constant_scale'
+        )
+
+       self.sigma_scale = self.add_weight(
+            shape=(),
+            initializer=tf.constant_initializer(self.initial_sigma_scale),
+            trainable=False,
+            dtype=tf.float32,
+            constraint=ClipByValue(1e-6, 1e6),
+            name='sigma_scale'
         )
 
        self.prior = tf.Variable(
@@ -150,7 +161,8 @@ class GaussianProcessApproximationLayer(layers.Layer):
         variances = self.calc_variance(ffs)
 
         stddevs = tf.math.sqrt(variances)
-        result = [output, stddevs[:, None]]
+        stddevs = tf.math.scalar_mul(self.sigma_scale, stddevs[:, None])
+        result = [output, stddevs]
         if return_features:
             result.append(ffs)
 
