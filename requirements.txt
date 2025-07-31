@@ -1,0 +1,6 @@
+# Core dependencies
+numpy==1.26.0        # Numerical computations
+PyYAML==6.0.2       # Data parsing
+tensorflow==2.16.2  # Required for models
+keras==3.6.0        # Required for models
+pandas==2.2.3       # Used for timestamp conversions
