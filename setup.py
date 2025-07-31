@@ -16,7 +16,7 @@ setup(
     description="JLab datascience toolkit for composable workflows",
     author="JLab DataScience Department",
     author_email="schram@jlab.org, kishan@jlab.org, dianam@jlab.org, dlersch@jlab.org",
-    packages=['jlab_datascience_toolkit','jlab_datascience_toolkit/keras'],
+    packages=[find_packages('jlab_datascience_toolkit'),find_packages('jlab_datascience_toolkit/keras')],
     install_requires=get_packages(),
     python_requires='==3.10.*'
 )
