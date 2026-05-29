@@ -18,7 +18,7 @@ def gp_nll_loss(pred, y, std):
     sigma2_star = tf.square(std) + 1e-5  # Adding a small constant for numerical stability
 
     # NLL calculation
-    term1 = tf.math.log(2 * np.pi * sigma2_star)
+    term1 = tf.math.log(2 * np.pi * std)
     term2 = tf.square(pred - y) / sigma2_star
     loss = tf.reduce_mean(0.5 * (term1 + term2))
 

@@ -144,6 +144,7 @@ class GaussianProcessApproximationLayer(layers.Layer):
                 self.momentum * self.prior + (1 - self.momentum) * (tf.transpose(new_prior) @ new_prior / batch_size)
             )
             self.prior.assign(update_prior_op)
+            self.update_cov(self.prior)
         
         variances = self.calc_variance(ffs)
 
